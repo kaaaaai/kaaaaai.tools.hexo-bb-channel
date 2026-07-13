@@ -185,6 +185,7 @@ function renderClientContent(config) {
     <style>
       .post-block:has(.bb-channel-portable) .post-title,.post-block:has(.bb-channel-portable) .post-meta-container,body:has(.bb-channel-portable) .post-toc-wrap{display:none}
       .bb-channel-portable{max-width:100%;margin:0 auto;color:#242424}
+      .bb-channel-portable *{box-sizing:border-box}
       .bb-channel-portable .bb-channel-intro{position:relative;margin:0 0 1.55rem;padding:0;border-bottom:0}
       .bb-channel-portable .bb-channel-title{margin:0 0 .45rem;color:#202020;font-family:inherit;font-size:1.72rem;font-weight:700;line-height:1.2;letter-spacing:-.02em}
       .bb-channel-portable .bb-channel-intro-text{margin:0;color:#777;font-size:1rem;line-height:1.6;text-align:left}
@@ -201,7 +202,7 @@ function renderClientContent(config) {
       .bb-channel-portable .bb-channel-time{color:inherit;text-decoration:none;border-bottom:0;font-size:.96rem;line-height:1.3}
       .bb-channel-portable .bb-channel-body-with-media{display:grid;grid-template-columns:minmax(0,1fr) minmax(9rem,14rem);gap:1.15rem;align-items:start}
       .bb-channel-portable .bb-channel-main{min-width:0}
-      .bb-channel-portable .bb-channel-content{font-size:1rem;line-height:1.78}
+      .bb-channel-portable .bb-channel-content{font-size:1rem;line-height:1.78;overflow-wrap:anywhere}
       .bb-channel-portable .bb-channel-content p{margin:0 0 .9em}
       .bb-channel-portable .bb-channel-content a{color:#e46f0a;border-bottom:1px solid rgba(228,111,10,.35);text-decoration:none}
       .bb-channel-portable .bb-channel-media-rail{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.35rem;justify-self:end;width:min(14rem,100%)}
@@ -232,7 +233,7 @@ function renderClientContent(config) {
       .bb-channel-portable .bb-channel-pagination button,.bb-channel-portable .bb-channel-pagination span{display:inline-flex;min-width:3.4rem;height:2.15rem;align-items:center;justify-content:center;border:1px solid #e8e8e8;border-radius:7px;color:#777;background:#fff}
       .bb-channel-portable .bb-channel-pagination span{min-width:2.15rem;background:#333;color:#fff;border-color:#333}
       @media(max-width:720px){.bb-channel-portable .bb-channel-body-with-media{grid-template-columns:1fr}.bb-channel-portable .bb-channel-media-rail{justify-self:start;width:min(18rem,100%)}}
-      @media(max-width:640px){.bb-channel-portable .bb-channel-feed{padding-left:1.45rem}.bb-channel-portable .bb-channel-dot{left:-1.5rem}.bb-channel-portable .bb-channel-card-surface{padding:1.1rem 1.05rem}.bb-channel-portable .bb-channel-card:hover .bb-channel-card-surface{transform:translate(3px,-4px)}.bb-channel-portable .bb-channel-title{font-size:1.45rem}}
+      @media(max-width:640px){.bb-channel-portable .bb-channel-intro{margin-bottom:1.2rem}.bb-channel-portable .bb-channel-title{font-size:1.45rem}.bb-channel-portable .bb-channel-intro-text{font-size:.94rem}.bb-channel-portable .bb-channel-feed{gap:.9rem;padding-left:1.15rem}.bb-channel-portable .bb-channel-feed::before{left:.06rem}.bb-channel-portable .bb-channel-dot{left:-1.32rem;top:1.42rem}.bb-channel-portable .bb-channel-card-surface{padding:1.05rem .95rem;border-radius:12px}.bb-channel-portable .bb-channel-card-placeholder{border-radius:12px}.bb-channel-portable .bb-channel-card:hover .bb-channel-card-surface{transform:none}.bb-channel-portable .bb-channel-meta{margin-bottom:.85rem}.bb-channel-portable .bb-channel-content{font-size:.96rem;line-height:1.72}.bb-channel-portable .bb-channel-media-rail{width:100%;max-width:20rem;grid-template-columns:repeat(3,minmax(0,1fr));justify-self:center;margin-top:.15rem}.bb-channel-portable .bb-channel-media-thumb{min-height:4.1rem}.bb-channel-portable .bb-channel-image-viewer{margin-top:.95rem;max-width:100%}.bb-channel-portable .bb-channel-image-slide img{max-height:68vh}.bb-channel-portable .bb-channel-image-nav{width:2.55rem;height:2.55rem}.bb-channel-portable .bb-channel-image-prev{left:.45rem}.bb-channel-portable .bb-channel-image-next{right:.45rem}.bb-channel-portable .bb-channel-attachment{align-items:flex-start;padding:.78rem .82rem}.bb-channel-portable .bb-channel-attachment-title{white-space:normal;overflow-wrap:anywhere}.bb-channel-portable .bb-channel-tags{gap:.42rem}.bb-channel-portable .bb-channel-pagination{gap:1rem}}
       @media(prefers-reduced-motion:reduce){.bb-channel-portable .bb-channel-card-placeholder,.bb-channel-portable .bb-channel-card-surface,.bb-channel-portable .bb-channel-attachment{transition:none}.bb-channel-portable .bb-channel-card:hover .bb-channel-card-surface{transform:none}}
     </style>
     <div class="bb-channel-portable" data-bb-channel-root data-api-base="${escapeHtml(config.apiBase)}" data-page-size="${escapeHtml(config.pageSize)}">

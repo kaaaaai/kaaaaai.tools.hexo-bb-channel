@@ -52,6 +52,8 @@ test('renderClientContent outputs a scoped shell and client API fetcher', () => 
   assert.match(html, /data-bb-media-index/);
   assert.match(html, /scroll-snap-type:x mandatory/);
   assert.match(html, /object-fit:contain/);
+  assert.match(html, /@media\(max-width:640px\)/);
+  assert.match(html, /justify-self:center/);
   assert.match(html, /bb-channel-feed::before/);
   assert.match(html, /bb-channel-tags span/);
   assert.match(html, /bb-channel-card-placeholder/);
