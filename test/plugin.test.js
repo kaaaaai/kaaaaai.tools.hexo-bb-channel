@@ -40,6 +40,8 @@ test('renderClientContent outputs a scoped shell and client API fetcher', () => 
   assert.match(html, /role="heading" aria-level="1">moments<\/div>/);
   assert.match(html, /data-api-base="https:\/\/channel\.example\.com"/);
   assert.match(html, /fetch\(url\.toString\(\)/);
+  assert.match(html, /data-pjax/);
+  assert.match(html, /window\.initBbChannel/);
   assert.match(html, /bb-channel-card-placeholder/);
   assert.doesNotMatch(html, /<h1 class="bb-channel-title"/);
 });
@@ -57,5 +59,6 @@ test('createBbPages generates a single dynamic route page', () => {
   assert.equal(pages[0].path, 'bb/index.html');
   assert.equal(pages[0].layout, 'page');
   assert.equal(pages[0].data.title, 'moments');
+  assert.equal(pages[0].data.comments, true);
   assert.match(pages[0].data.content, /bb-channel-root/);
 });

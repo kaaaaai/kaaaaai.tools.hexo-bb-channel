@@ -8,6 +8,7 @@ function createBbPages(config) {
     data: {
       title: config.title,
       description: config.description,
+      comments: true,
       content: renderClientContent(config),
     },
   }];

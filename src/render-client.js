@@ -12,15 +12,17 @@ function normalizeHtml(html) {
 
 function renderClientScript() {
   return `
-    <script>
+    <script data-pjax>
       (() => {
-        const root = document.querySelector('[data-bb-channel-root]');
-        if (!root) return;
-        const apiBase = root.dataset.apiBase;
-        const pageSize = root.dataset.pageSize || '20';
-        const feed = root.querySelector('[data-bb-channel-feed]');
-        const pager = root.querySelector('[data-bb-channel-pagination]');
-        const status = root.querySelector('[data-bb-channel-status]');
+        window.initBbChannel = window.initBbChannel || (() => {
+          const root = document.querySelector('[data-bb-channel-root]');
+          if (!root || root.dataset.bbChannelReady === 'true') return;
+          root.dataset.bbChannelReady = 'true';
+          const apiBase = root.dataset.apiBase;
+          const pageSize = root.dataset.pageSize || '20';
+          const feed = root.querySelector('[data-bb-channel-feed]');
+          const pager = root.querySelector('[data-bb-channel-pagination]');
+          const status = root.querySelector('[data-bb-channel-status]');
 
         const escapeHtml = (value = '') => String(value)
           .replace(/&/g, '&amp;')
@@ -85,8 +87,12 @@ function renderClientScript() {
         pager.addEventListener('click', (event) => {
           const button = event.target.closest('button[data-page]');
           if (button) loadPage(button.dataset.page).catch((error) => { status.textContent = error.message; });
+          });
+          loadPage().catch((error) => { status.textContent = error.message; });
         });
-        loadPage().catch((error) => { status.textContent = error.message; });
+        window.initBbChannel();
+        document.addEventListener('DOMContentLoaded', window.initBbChannel, { once: true });
+        document.addEventListener('pjax:success', window.initBbChannel);
       })();
     </script>
   `;
