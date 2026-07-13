@@ -59,6 +59,7 @@ function renderClientScript() {
           ).join('');
           return '<section class="bb-channel-card" id="bb-' + escapeHtml(post.id) + '">' +
             '<span class="bb-channel-dot" aria-hidden="true"></span>' +
+            '<span class="bb-channel-card-placeholder" aria-hidden="true"></span>' +
             '<div class="bb-channel-card-surface">' +
               '<header class="bb-channel-meta">' +
                 '<a class="bb-channel-time" href="' + escapeHtml(post.source && post.source.telegramUrl || '#') + '" target="_blank" rel="noopener noreferrer">' + escapeHtml(formatDate(post.datetime)) + '</a>' +
@@ -121,8 +122,10 @@ function renderClientContent(config) {
       .bb-channel-portable .bb-channel-feed{position:relative;display:flex;flex-direction:column;gap:1.05rem;padding-left:2.1rem}
       .bb-channel-portable .bb-channel-feed::before{content:"";position:absolute;left:.22rem;top:.25rem;bottom:.25rem;width:1px;background:linear-gradient(to bottom,rgba(226,226,226,0),#e2e2e2 1.2rem,#e2e2e2 calc(100% - 1.2rem),rgba(226,226,226,0))}
       .bb-channel-portable .bb-channel-card{position:relative;border-radius:14px}
-      .bb-channel-portable .bb-channel-card-surface{position:relative;z-index:1;border:1px solid #e9e9e9;border-radius:14px;background:rgba(255,255,255,.66);padding:1.45rem 1.65rem;box-shadow:none;transition:border-color 260ms cubic-bezier(.22,1,.36,1),background-color 260ms cubic-bezier(.22,1,.36,1),box-shadow 260ms cubic-bezier(.22,1,.36,1),transform 260ms cubic-bezier(.22,1,.36,1)}
-      .bb-channel-portable .bb-channel-card:hover .bb-channel-card-surface{transform:translate(3px,-3px);border-color:#dedede;background:rgba(255,255,255,.84);box-shadow:0 12px 30px -28px rgba(15,23,42,.3)}
+      .bb-channel-portable .bb-channel-card-placeholder{pointer-events:none;position:absolute;inset:0;border:1px dashed #d9d9d9;border-radius:14px;background:rgba(255,255,255,.2);opacity:0;transition:opacity 320ms cubic-bezier(.22,1,.36,1)}
+      .bb-channel-portable .bb-channel-card-surface{position:relative;z-index:1;border:1px dashed #d9d9d9;border-radius:14px;background:rgba(255,255,255,.66);padding:1.45rem 1.65rem;box-shadow:none;transition:border-color 320ms cubic-bezier(.22,1,.36,1),background-color 320ms cubic-bezier(.22,1,.36,1),box-shadow 320ms cubic-bezier(.22,1,.36,1),transform 320ms cubic-bezier(.22,1,.36,1)}
+      .bb-channel-portable .bb-channel-card:hover .bb-channel-card-placeholder{opacity:1}
+      .bb-channel-portable .bb-channel-card:hover .bb-channel-card-surface{transform:translate(6px,-6px);border-style:solid;border-color:#e7b99d;background:rgba(255,255,255,.86);box-shadow:0 14px 30px -28px rgba(15,23,42,.32)}
       .bb-channel-portable .bb-channel-dot{position:absolute;left:-2.16rem;top:1.7rem;z-index:2;width:.56rem;height:.56rem;border-radius:999px;background:#ff7900;box-shadow:0 0 0 .28rem rgba(255,121,0,.12)}
       .bb-channel-portable .bb-channel-meta{display:flex;align-items:center;gap:.7rem;margin:0 0 1.08rem;color:#737373;font-weight:500}
       .bb-channel-portable .bb-channel-time{color:inherit;text-decoration:none;border-bottom:0;font-size:.96rem;line-height:1.3}
@@ -144,8 +147,8 @@ function renderClientContent(config) {
       .bb-channel-portable .bb-channel-pagination{display:flex;align-items:center;justify-content:center;gap:3rem;margin-top:1.8rem}
       .bb-channel-portable .bb-channel-pagination button,.bb-channel-portable .bb-channel-pagination span{display:inline-flex;min-width:3.4rem;height:2.15rem;align-items:center;justify-content:center;border:1px solid #e8e8e8;border-radius:7px;color:#777;background:#fff}
       .bb-channel-portable .bb-channel-pagination span{min-width:2.15rem;background:#333;color:#fff;border-color:#333}
-      @media(max-width:640px){.bb-channel-portable .bb-channel-feed{padding-left:1.45rem}.bb-channel-portable .bb-channel-dot{left:-1.5rem}.bb-channel-portable .bb-channel-card-surface{padding:1.1rem 1.05rem}.bb-channel-portable .bb-channel-card:hover .bb-channel-card-surface{transform:none}.bb-channel-portable .bb-channel-title{font-size:1.45rem}}
-      @media(prefers-reduced-motion:reduce){.bb-channel-portable .bb-channel-card-surface,.bb-channel-portable .bb-channel-attachment{transition:none}.bb-channel-portable .bb-channel-card:hover .bb-channel-card-surface{transform:none}}
+      @media(max-width:640px){.bb-channel-portable .bb-channel-feed{padding-left:1.45rem}.bb-channel-portable .bb-channel-dot{left:-1.5rem}.bb-channel-portable .bb-channel-card-surface{padding:1.1rem 1.05rem}.bb-channel-portable .bb-channel-card:hover .bb-channel-card-surface{transform:translate(3px,-4px)}.bb-channel-portable .bb-channel-title{font-size:1.45rem}}
+      @media(prefers-reduced-motion:reduce){.bb-channel-portable .bb-channel-card-placeholder,.bb-channel-portable .bb-channel-card-surface,.bb-channel-portable .bb-channel-attachment{transition:none}.bb-channel-portable .bb-channel-card:hover .bb-channel-card-surface{transform:none}}
     </style>
     <div class="bb-channel-portable" data-bb-channel-root data-api-base="${escapeHtml(config.apiBase)}" data-page-size="${escapeHtml(config.pageSize)}">
       <header class="bb-channel-intro">

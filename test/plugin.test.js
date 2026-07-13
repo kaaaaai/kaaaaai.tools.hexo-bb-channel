@@ -47,11 +47,11 @@ test('renderClientContent outputs a scoped shell and client API fetcher', () => 
   assert.match(html, /bb-channel-lucide-file/);
   assert.match(html, /bb-channel-feed::before/);
   assert.match(html, /bb-channel-tags span/);
+  assert.match(html, /bb-channel-card-placeholder/);
   assert.doesNotMatch(html, /<h1 class="bb-channel-title"/);
   assert.doesNotMatch(html, /bb-channel-attachment-icon::after/);
   assert.doesNotMatch(html, /bb-channel-attachment-open/);
   assert.doesNotMatch(html, /bb-channel-card-more/);
-  assert.doesNotMatch(html, /bb-channel-card-placeholder/);
 });
 
 test('createBbPages generates a single dynamic route page', () => {
