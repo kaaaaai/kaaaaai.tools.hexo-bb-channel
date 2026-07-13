@@ -1,3 +1,5 @@
+const { externalLinkIcon, fileIcon } = require('./icons');
+
 function escapeHtml(value = '') {
   return String(value)
     .replace(/&/g, '&amp;')
@@ -14,6 +16,8 @@ function renderClientScript() {
   return `
     <script data-pjax>
       (() => {
+        const bbChannelFileIcon = ${JSON.stringify(fileIcon)};
+        const bbChannelExternalLinkIcon = ${JSON.stringify(externalLinkIcon)};
         window.initBbChannel = window.initBbChannel || (() => {
           const root = document.querySelector('[data-bb-channel-root]');
           if (!root || root.dataset.bbChannelReady === 'true') return;
@@ -47,18 +51,18 @@ function renderClientScript() {
           const tags = (post.tags || []).map((tag) => '<span>#' + escapeHtml(tag) + '</span>').join('');
           const attachments = (post.attachments || []).map((item) =>
             '<a class="bb-channel-attachment" href="' + escapeHtml(item.url || (post.source && post.source.telegramUrl) || '#') + '" target="_blank" rel="noopener noreferrer">' +
-              '<span class="bb-channel-attachment-icon" aria-hidden="true"></span>' +
+              '<span class="bb-channel-attachment-icon">' + bbChannelFileIcon + '</span>' +
               '<span class="bb-channel-attachment-main">' +
                 '<span class="bb-channel-attachment-title">' + escapeHtml(item.title || 'Attachment') + '</span>' +
                 (item.meta ? '<span class="bb-channel-attachment-meta">' + escapeHtml(item.meta) + '</span>' : '') +
               '</span>' +
+              '<span class="bb-channel-attachment-open">' + bbChannelExternalLinkIcon + '</span>' +
             '</a>'
           ).join('');
           return '<section class="bb-channel-card" id="bb-' + escapeHtml(post.id) + '">' +
-            '<span class="bb-channel-card-placeholder" aria-hidden="true"></span>' +
+            '<span class="bb-channel-dot" aria-hidden="true"></span>' +
             '<div class="bb-channel-card-surface">' +
               '<header class="bb-channel-meta">' +
-                '<span class="bb-channel-dot" aria-hidden="true"></span>' +
                 '<a class="bb-channel-time" href="' + escapeHtml(post.source && post.source.telegramUrl || '#') + '" target="_blank" rel="noopener noreferrer">' + escapeHtml(formatDate(post.datetime)) + '</a>' +
                 '<span class="bb-channel-card-more" aria-hidden="true">...</span>' +
               '</header>' +
@@ -112,40 +116,43 @@ function renderClientContent(config) {
   return normalizeHtml(`
     <style>
       .post-block:has(.bb-channel-portable) .post-title,.post-block:has(.bb-channel-portable) .post-meta-container,body:has(.bb-channel-portable) .post-toc-wrap{display:none}
-      .bb-channel-portable{max-width:100%;margin:0 auto;color:#333}
-      .bb-channel-portable .bb-channel-intro{position:relative;margin:0 0 1rem;padding:0;border-bottom:0}
-      .bb-channel-portable .bb-channel-title{margin:0 0 .35rem;color:#222;font-family:inherit;font-size:1.65rem;font-weight:700;line-height:1.25}
-      .bb-channel-portable .bb-channel-intro-text{margin:0;color:#777;font-size:1rem;line-height:1.65;text-align:left}
-      .bb-channel-portable .bb-channel-status{min-height:1.5rem;margin:.8rem 0;color:#999}
-      .bb-channel-portable .bb-channel-feed{display:flex;flex-direction:column;gap:1.2rem}
-      .bb-channel-portable .bb-channel-card{position:relative;border-radius:16px}
-      .bb-channel-portable .bb-channel-card-placeholder{pointer-events:none;position:absolute;inset:0;border:1px dashed #ddd;border-radius:16px;background:rgba(255,255,255,.18);opacity:0;transition:opacity 360ms cubic-bezier(0.37,0,0.63,1)}
-      .bb-channel-portable .bb-channel-card-surface{position:relative;z-index:1;min-height:8.75rem;border:1px dashed #ddd;border-radius:16px;background:rgba(255,255,255,.54);padding:1.55rem 2rem;box-shadow:none;transition:border-color 360ms cubic-bezier(0.37,0,0.63,1),background-color 360ms cubic-bezier(0.37,0,0.63,1),box-shadow 360ms cubic-bezier(0.37,0,0.63,1),transform 360ms cubic-bezier(0.37,0,0.63,1)}
-      .bb-channel-portable .bb-channel-card:hover .bb-channel-card-placeholder{opacity:1}
-      .bb-channel-portable .bb-channel-card:hover .bb-channel-card-surface{transform:translate(6px,-6px);border-style:solid;border-color:rgba(122,36,48,.18);background:rgba(255,255,255,.82);box-shadow:0 14px 34px -30px rgba(225,106,15,.28),0 8px 24px -22px rgba(15,23,42,.18)}
-      .bb-channel-portable .bb-channel-dot{width:.6rem;height:.6rem;border-radius:999px;background:#df7a16;box-shadow:0 0 0 .32rem rgba(223,122,22,.12)}
-      .bb-channel-portable .bb-channel-meta{display:flex;align-items:center;gap:.8rem;margin:0 0 1.2rem;color:#777;font-weight:500}
-      .bb-channel-portable .bb-channel-time{color:inherit;text-decoration:none;border-bottom:0;font-size:.93rem}
-      .bb-channel-portable .bb-channel-card-more{margin-left:auto;color:#777;font-size:1.15rem;font-weight:700;line-height:1;letter-spacing:.08em}
-      .bb-channel-portable .bb-channel-content{font-size:1rem;line-height:1.9}
-      .bb-channel-portable .bb-channel-content p{margin:0 0 1.15em}
+      .bb-channel-portable{max-width:100%;margin:0 auto;color:#242424}
+      .bb-channel-portable .bb-channel-intro{position:relative;margin:0 0 1.55rem;padding:0;border-bottom:0}
+      .bb-channel-portable .bb-channel-title{margin:0 0 .45rem;color:#202020;font-family:inherit;font-size:1.72rem;font-weight:700;line-height:1.2;letter-spacing:-.02em}
+      .bb-channel-portable .bb-channel-intro-text{margin:0;color:#777;font-size:1rem;line-height:1.6;text-align:left}
+      .bb-channel-portable .bb-channel-status{min-height:1.2rem;margin:.4rem 0 .8rem;color:#999}
+      .bb-channel-portable .bb-channel-feed{position:relative;display:flex;flex-direction:column;gap:1.05rem;padding-left:2.1rem}
+      .bb-channel-portable .bb-channel-feed::before{content:"";position:absolute;left:.22rem;top:.25rem;bottom:.25rem;width:1px;background:linear-gradient(to bottom,rgba(226,226,226,0),#e2e2e2 1.2rem,#e2e2e2 calc(100% - 1.2rem),rgba(226,226,226,0))}
+      .bb-channel-portable .bb-channel-card{position:relative;border-radius:14px}
+      .bb-channel-portable .bb-channel-card-surface{position:relative;z-index:1;border:1px solid #e9e9e9;border-radius:14px;background:rgba(255,255,255,.66);padding:1.45rem 1.65rem;box-shadow:none;transition:border-color 260ms cubic-bezier(.22,1,.36,1),background-color 260ms cubic-bezier(.22,1,.36,1),box-shadow 260ms cubic-bezier(.22,1,.36,1),transform 260ms cubic-bezier(.22,1,.36,1)}
+      .bb-channel-portable .bb-channel-card:hover .bb-channel-card-surface{transform:translate(3px,-3px);border-color:#dedede;background:rgba(255,255,255,.84);box-shadow:0 12px 30px -28px rgba(15,23,42,.3)}
+      .bb-channel-portable .bb-channel-dot{position:absolute;left:-2.16rem;top:1.7rem;z-index:2;width:.56rem;height:.56rem;border-radius:999px;background:#ff7900;box-shadow:0 0 0 .28rem rgba(255,121,0,.12)}
+      .bb-channel-portable .bb-channel-meta{display:flex;align-items:center;gap:.7rem;margin:0 0 1.08rem;color:#737373;font-weight:500}
+      .bb-channel-portable .bb-channel-time{color:inherit;text-decoration:none;border-bottom:0;font-size:.96rem;line-height:1.3}
+      .bb-channel-portable .bb-channel-card-more{margin-left:auto;color:#6f6f6f;font-size:1.05rem;font-weight:700;line-height:1;letter-spacing:.08em}
+      .bb-channel-portable .bb-channel-content{font-size:1rem;line-height:1.78}
+      .bb-channel-portable .bb-channel-content p{margin:0 0 .9em}
+      .bb-channel-portable .bb-channel-content a{color:#e46f0a;border-bottom:1px solid rgba(228,111,10,.35);text-decoration:none}
       .bb-channel-portable .bb-channel-media{margin-top:1rem}
-      .bb-channel-portable .bb-channel-media img{display:block;max-width:100%;border:1px solid #ddd;border-radius:10px}
-      .bb-channel-portable .bb-channel-attachments{display:flex;flex-direction:column;gap:.65rem;margin-top:1rem}
-      .bb-channel-portable .bb-channel-attachment{display:flex;align-items:center;gap:.75rem;border:1px solid #e5e0d8;border-radius:10px;background:rgba(250,248,243,.72);padding:.8rem .9rem;color:#333;text-decoration:none}
-      .bb-channel-portable .bb-channel-attachment:hover{border-color:#d7cbbb;background:rgba(255,252,245,.92)}
-      .bb-channel-portable .bb-channel-attachment-icon{width:2.1rem;height:2.1rem;flex:0 0 auto;border-radius:8px;background:linear-gradient(135deg,#f0a33b,#d96c1c);position:relative}
-      .bb-channel-portable .bb-channel-attachment-icon::after{content:"";position:absolute;left:.62rem;top:.5rem;width:.85rem;height:1.05rem;border:2px solid rgba(255,255,255,.9);border-radius:2px}
+      .bb-channel-portable .bb-channel-media img{display:block;max-width:100%;border:1px solid #e5e5e5;border-radius:10px}
+      .bb-channel-portable .bb-channel-attachments{display:flex;flex-direction:column;gap:.65rem;margin-top:.9rem}
+      .bb-channel-portable .bb-channel-attachment{display:flex;align-items:center;gap:.8rem;border:1px solid #e3ddd4;border-radius:10px;background:rgba(250,248,243,.58);padding:.82rem .95rem;color:#333;text-decoration:none;transition:border-color 220ms ease,background-color 220ms ease,box-shadow 220ms ease}
+      .bb-channel-portable .bb-channel-attachment:hover{border-color:#d6cbbd;background:rgba(255,252,246,.9);box-shadow:0 8px 22px -20px rgba(15,23,42,.28)}
+      .bb-channel-portable .bb-channel-attachment-icon{display:grid;width:2rem;height:2rem;place-items:center;flex:0 0 auto;border:1px solid rgba(214,203,189,.82);border-radius:9px;background:rgba(255,255,255,.56);color:#c96b18}
+      .bb-channel-portable .bb-channel-lucide{display:block;width:1.08rem;height:1.08rem;stroke-width:1.9}
       .bb-channel-portable .bb-channel-attachment-main{display:flex;min-width:0;flex-direction:column;gap:.12rem}
       .bb-channel-portable .bb-channel-attachment-title{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.95rem;font-weight:600}
       .bb-channel-portable .bb-channel-attachment-meta{color:#888;font-size:.82rem}
-      .bb-channel-portable .bb-channel-tags{display:flex;flex-wrap:wrap;gap:.55rem;margin-top:1rem;color:#777;font-size:.88rem}
-      .bb-channel-portable .bb-channel-tags span{border-bottom:1px dotted #aaa}
+      .bb-channel-portable .bb-channel-attachment-open{display:grid;width:1.4rem;height:1.4rem;place-items:center;margin-left:auto;color:#777;opacity:.72;transition:opacity 220ms ease,transform 220ms ease}
+      .bb-channel-portable .bb-channel-attachment:hover .bb-channel-attachment-open{opacity:.95;transform:translate(1px,-1px)}
+      .bb-channel-portable .bb-channel-attachment-open .bb-channel-lucide{width:.95rem;height:.95rem;stroke-width:2.2}
+      .bb-channel-portable .bb-channel-tags{display:flex;flex-wrap:wrap;gap:.55rem;margin-top:.9rem;color:#676767;font-size:.86rem}
+      .bb-channel-portable .bb-channel-tags span{display:inline-flex;align-items:center;border:0;border-radius:6px;background:#f3f3f3;padding:.18rem .5rem;line-height:1.5}
       .bb-channel-portable .bb-channel-pagination{display:flex;align-items:center;justify-content:center;gap:3rem;margin-top:1.8rem}
       .bb-channel-portable .bb-channel-pagination button,.bb-channel-portable .bb-channel-pagination span{display:inline-flex;min-width:3.4rem;height:2.15rem;align-items:center;justify-content:center;border:1px solid #e8e8e8;border-radius:7px;color:#777;background:#fff}
       .bb-channel-portable .bb-channel-pagination span{min-width:2.15rem;background:#333;color:#fff;border-color:#333}
-      @media(max-width:640px){.bb-channel-portable .bb-channel-card-surface{padding:1.15rem}.bb-channel-portable .bb-channel-card:hover .bb-channel-card-surface{transform:translate(3px,-4px)}.bb-channel-portable .bb-channel-title{font-size:1.45rem}}
-      @media(prefers-reduced-motion:reduce){.bb-channel-portable .bb-channel-card-placeholder,.bb-channel-portable .bb-channel-card-surface{transition:none}.bb-channel-portable .bb-channel-card:hover .bb-channel-card-surface{transform:none}}
+      @media(max-width:640px){.bb-channel-portable .bb-channel-feed{padding-left:1.45rem}.bb-channel-portable .bb-channel-dot{left:-1.5rem}.bb-channel-portable .bb-channel-card-surface{padding:1.1rem 1.05rem}.bb-channel-portable .bb-channel-card:hover .bb-channel-card-surface{transform:none}.bb-channel-portable .bb-channel-title{font-size:1.45rem}}
+      @media(prefers-reduced-motion:reduce){.bb-channel-portable .bb-channel-card-surface,.bb-channel-portable .bb-channel-attachment,.bb-channel-portable .bb-channel-attachment-open{transition:none}.bb-channel-portable .bb-channel-card:hover .bb-channel-card-surface,.bb-channel-portable .bb-channel-attachment:hover .bb-channel-attachment-open{transform:none}}
     </style>
     <div class="bb-channel-portable" data-bb-channel-root data-api-base="${escapeHtml(config.apiBase)}" data-page-size="${escapeHtml(config.pageSize)}">
       <header class="bb-channel-intro">
