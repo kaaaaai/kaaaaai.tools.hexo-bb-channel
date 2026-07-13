@@ -142,6 +142,7 @@ function renderClientScript() {
               if (holder) holder.dataset.bbLoaded = 'error';
             }, { once: true });
             img.src = img.dataset.bbImageUrl;
+            if (img.complete && holder) holder.dataset.bbLoaded = 'true';
           });
         };
 
@@ -220,25 +221,25 @@ function renderClientContent(config) {
       .bb-channel-portable .bb-channel-title{margin:0 0 .45rem;color:#202020;font-family:inherit;font-size:1.72rem;font-weight:700;line-height:1.2;letter-spacing:-.02em}
       .bb-channel-portable .bb-channel-intro-text{margin:0;color:#777;font-size:1rem;line-height:1.6;text-align:left}
       .bb-channel-portable .bb-channel-status{min-height:1.2rem;margin:.4rem 0 .8rem;color:#999}
-      .bb-channel-portable .bb-channel-feed{position:relative;display:flex;flex-direction:column;gap:1.05rem;padding-left:2.1rem}
+      .bb-channel-portable .bb-channel-feed{position:relative;display:flex;flex-direction:column;gap:1rem;padding-left:2.1rem}
       .bb-channel-portable .bb-channel-feed::before{content:"";position:absolute;left:.22rem;top:.25rem;bottom:.25rem;width:1px;background:linear-gradient(to bottom,rgba(226,226,226,0),#e2e2e2 1.2rem,#e2e2e2 calc(100% - 1.2rem),rgba(226,226,226,0))}
       .bb-channel-portable .bb-channel-card{position:relative;border-radius:14px}
       .bb-channel-portable .bb-channel-card-placeholder{pointer-events:none;position:absolute;inset:0;border:1px dashed #d9d9d9;border-radius:14px;background:rgba(255,255,255,.2);opacity:0;transition:opacity 320ms cubic-bezier(.22,1,.36,1)}
-      .bb-channel-portable .bb-channel-card-surface{position:relative;z-index:1;border:1px dashed #d9d9d9;border-radius:14px;background:rgba(255,255,255,.66);padding:1.45rem 1.65rem;box-shadow:none;transition:border-color 320ms cubic-bezier(.22,1,.36,1),background-color 320ms cubic-bezier(.22,1,.36,1),box-shadow 320ms cubic-bezier(.22,1,.36,1),transform 320ms cubic-bezier(.22,1,.36,1)}
+      .bb-channel-portable .bb-channel-card-surface{position:relative;z-index:1;border:1px solid #ececec;border-radius:14px;background:rgba(255,255,255,.76);padding:1.25rem 1.45rem;box-shadow:0 10px 24px -28px rgba(15,23,42,.22);transition:border-color 320ms cubic-bezier(.22,1,.36,1),background-color 320ms cubic-bezier(.22,1,.36,1),box-shadow 320ms cubic-bezier(.22,1,.36,1),transform 320ms cubic-bezier(.22,1,.36,1)}
       .bb-channel-portable .bb-channel-card:hover .bb-channel-card-placeholder{opacity:1}
-      .bb-channel-portable .bb-channel-card:hover .bb-channel-card-surface{transform:translate(6px,-6px);border-style:solid;border-color:#e7b99d;background:rgba(255,255,255,.86);box-shadow:0 14px 30px -28px rgba(15,23,42,.32)}
-      .bb-channel-portable .bb-channel-dot{position:absolute;left:-2.16rem;top:1.7rem;z-index:2;width:.56rem;height:.56rem;border-radius:999px;background:#ff7900;box-shadow:0 0 0 .28rem rgba(255,121,0,.12)}
-      .bb-channel-portable .bb-channel-meta{display:flex;align-items:center;gap:.7rem;margin:0 0 1.08rem;color:#737373;font-weight:500}
-      .bb-channel-portable .bb-channel-time{color:inherit;text-decoration:none;border-bottom:0;font-size:.96rem;line-height:1.3}
-      .bb-channel-portable .bb-channel-body-with-media{display:grid;grid-template-columns:minmax(0,1fr) minmax(9rem,14rem);gap:1.15rem;align-items:start}
+      .bb-channel-portable .bb-channel-card:hover .bb-channel-card-surface{transform:translate(5px,-5px);border-color:#ead7c9;background:rgba(255,255,255,.9);box-shadow:0 16px 34px -30px rgba(15,23,42,.36)}
+      .bb-channel-portable .bb-channel-dot{position:absolute;left:-2.16rem;top:1.55rem;z-index:2;width:.52rem;height:.52rem;border-radius:999px;background:#ff7900;box-shadow:0 0 0 .28rem rgba(255,121,0,.12)}
+      .bb-channel-portable .bb-channel-meta{display:flex;align-items:center;gap:.7rem;margin:0 0 .86rem;color:#737373;font-weight:500}
+      .bb-channel-portable .bb-channel-time{color:inherit;text-decoration:none;border-bottom:0;font-size:.88rem;line-height:1.3}
+      .bb-channel-portable .bb-channel-body-with-media{display:grid;grid-template-columns:minmax(0,1fr) minmax(10rem,13.5rem);gap:1.25rem;align-items:start}
       .bb-channel-portable .bb-channel-main{min-width:0}
-      .bb-channel-portable .bb-channel-content{font-size:1rem;line-height:1.78;overflow-wrap:anywhere}
-      .bb-channel-portable .bb-channel-content p{margin:0 0 .9em}
+      .bb-channel-portable .bb-channel-content{font-size:.98rem;line-height:1.68;overflow-wrap:anywhere}
+      .bb-channel-portable .bb-channel-content p{margin:0 0 .72em}
       .bb-channel-portable .bb-channel-content a{color:#e46f0a;border-bottom:1px solid rgba(228,111,10,.35);text-decoration:none}
-      .bb-channel-portable .bb-channel-media-rail{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.35rem;justify-self:end;width:min(14rem,100%)}
-      .bb-channel-portable .bb-channel-media-thumb{position:relative;display:grid;min-height:3.85rem;aspect-ratio:1/1;place-items:center;border:1px solid #e5e5e5;border-radius:8px;background:#fafafa;padding:0;overflow:hidden;cursor:pointer}
+      .bb-channel-portable .bb-channel-media-rail{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.32rem;justify-self:end;width:min(13.5rem,100%)}
+      .bb-channel-portable .bb-channel-media-thumb{position:relative;display:grid;min-height:0;aspect-ratio:1/1;place-items:center;border:1px solid #e7e7e7;border-radius:8px;background:#f8f8f8;padding:0;overflow:hidden;cursor:pointer}
       .bb-channel-portable .bb-channel-media-thumb:focus-visible,.bb-channel-portable .bb-channel-image-nav:focus-visible,.bb-channel-portable .bb-channel-image-close:focus-visible,.bb-channel-portable .bb-channel-image-track:focus-visible{outline:2px solid rgba(255,121,0,.46);outline-offset:3px}
-      .bb-channel-portable .bb-channel-media-thumb:only-child{aspect-ratio:4/3;grid-column:1/-1}
+      .bb-channel-portable .bb-channel-media-thumb:only-child{aspect-ratio:16/10;grid-column:1/-1}
       .bb-channel-portable .bb-channel-media-img{position:relative;z-index:1;display:block!important;width:100%!important;height:100%!important;max-width:100%!important;max-height:100%!important;margin:0!important;object-fit:contain!important;opacity:0;transition:opacity 180ms ease}
       .bb-channel-portable [data-bb-loaded="true"]>.bb-channel-media-img,.bb-channel-portable [data-bb-loaded="true"]>.bb-channel-image-large{opacity:1}
       .bb-channel-portable .bb-channel-image-skeleton{position:absolute;inset:0;display:block;border-radius:inherit;background:linear-gradient(100deg,rgba(245,245,245,.78) 0%,rgba(233,233,233,.94) 45%,rgba(247,247,247,.8) 80%);background-size:220% 100%;animation:bb-channel-shimmer 1.15s ease-in-out infinite}
@@ -264,8 +265,8 @@ function renderClientContent(config) {
       .bb-channel-portable .bb-channel-attachment-main{display:flex;min-width:0;flex-direction:column;gap:.12rem}
       .bb-channel-portable .bb-channel-attachment-title{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.95rem;font-weight:600}
       .bb-channel-portable .bb-channel-attachment-meta{color:#888;font-size:.82rem}
-      .bb-channel-portable .bb-channel-tags{display:flex;flex-wrap:wrap;gap:.55rem;margin-top:.9rem;color:#676767;font-size:.86rem}
-      .bb-channel-portable .bb-channel-tags span{display:inline-flex;align-items:center;border:0;border-radius:6px;background:#f3f3f3;padding:.18rem .5rem;line-height:1.5}
+      .bb-channel-portable .bb-channel-tags{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.75rem;color:#676767;font-size:.82rem}
+      .bb-channel-portable .bb-channel-tags span{display:inline-flex;align-items:center;border:0;border-radius:6px;background:#f4f4f4;padding:.15rem .46rem;line-height:1.5}
       .bb-channel-portable .bb-channel-pagination{display:flex;align-items:center;justify-content:center;gap:3rem;margin-top:1.8rem}
       .bb-channel-portable .bb-channel-pagination button,.bb-channel-portable .bb-channel-pagination span{display:inline-flex;min-width:3.4rem;height:2.15rem;align-items:center;justify-content:center;border:1px solid #e8e8e8;border-radius:7px;color:#777;background:#fff}
       .bb-channel-portable .bb-channel-pagination span{min-width:2.15rem;background:#333;color:#fff;border-color:#333}

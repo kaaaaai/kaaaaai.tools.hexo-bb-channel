@@ -57,6 +57,8 @@ test('renderClientContent outputs a scoped shell and client API fetcher', () => 
   assert.match(html, /hydrateImages/);
   assert.match(html, /scroll-snap-type:x mandatory/);
   assert.match(html, /object-fit:contain/);
+  assert.match(html, /border:1px solid #ececec/);
+  assert.match(html, /aspect-ratio:16\/10/);
   assert.match(html, /@media\(max-width:640px\)/);
   assert.match(html, /justify-self:center/);
   assert.match(html, /bb-channel-feed::before/);
