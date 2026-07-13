@@ -49,7 +49,12 @@ test('renderClientContent outputs a scoped shell and client API fetcher', () => 
   assert.match(html, /bb-channel-image-viewer/);
   assert.match(html, /bb-channel-image-track/);
   assert.match(html, /bb-channel-image-slide/);
+  assert.match(html, /bb-channel-image-close/);
+  assert.match(html, /bb-channel-image-skeleton/);
+  assert.match(html, /data-bb-img-src/);
+  assert.match(html, /bb-channel-image-large/);
   assert.match(html, /data-bb-media-index/);
+  assert.match(html, /hydrateImages/);
   assert.match(html, /scroll-snap-type:x mandatory/);
   assert.match(html, /object-fit:contain/);
   assert.match(html, /@media\(max-width:640px\)/);
