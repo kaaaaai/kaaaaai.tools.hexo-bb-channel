@@ -1,4 +1,4 @@
-# hexo-bb-channel
+# kaaaaai.tools.hexo-bb-channel
 
 Hexo plugin for rendering a Telegram channel as a dynamic microblog page.
 
@@ -13,14 +13,14 @@ npm install hexo-bb-channel
 If the package is not published yet, install from GitHub:
 
 ```bash
-npm install github:Kaaaaai/hexo-bb-channel
+npm install github:Kaaaaai/kaaaaai.tools.hexo-bb-channel
 ```
 
 ## Backend
 
 Deploy the companion Vercel API first:
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FKaaaaai%2Ftg-channel-api&project-name=tg-channel-api&repository-name=tg-channel-api&stores=%5B%7B%22type%22%3A%22integration%22%2C%22integrationSlug%22%3A%22upstash%22%2C%22productSlug%22%3A%22upstash-kv%22%2C%22protocol%22%3A%22storage%22%2C%22allowConnectExistingProduct%22%3Atrue%7D%5D&env=TG_CHANNEL,ALLOWED_ORIGINS,REFRESH_SECRET&CACHE_TTL=300&PAGE_SIZE=20&MAX_FETCH_PAGES=2&POST_LIMIT=500)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FKaaaaai%2Fkaaaaai.tools.channel-api&project-name=kaaaaai-tools-channel-api&repository-name=kaaaaai.tools.channel-api&stores=%5B%7B%22type%22%3A%22integration%22%2C%22integrationSlug%22%3A%22upstash%22%2C%22productSlug%22%3A%22upstash-kv%22%2C%22protocol%22%3A%22storage%22%2C%22allowConnectExistingProduct%22%3Atrue%7D%5D&env=TG_CHANNEL,ALLOWED_ORIGINS,REFRESH_SECRET&CACHE_TTL=300&PAGE_SIZE=20&MAX_FETCH_PAGES=2&POST_LIMIT=500)
 
 ## Hexo Config
 
