@@ -4,8 +4,8 @@ function createBbPages(config) {
   if (config.enable === false || (config.mode || 'client') !== 'client') return [];
   return [{
     path: `${config.route}index.html`,
+    layout: 'page',
     data: {
-      layout: 'page',
       title: config.title,
       description: config.description,
       content: renderClientContent(config),

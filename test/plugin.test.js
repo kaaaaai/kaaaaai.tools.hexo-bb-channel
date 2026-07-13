@@ -55,7 +55,7 @@ test('createBbPages generates a single dynamic route page', () => {
 
   assert.equal(pages.length, 1);
   assert.equal(pages[0].path, 'bb/index.html');
-  assert.equal(pages[0].data.layout, 'page');
+  assert.equal(pages[0].layout, 'page');
   assert.equal(pages[0].data.title, 'moments');
   assert.match(pages[0].data.content, /bb-channel-root/);
 });
