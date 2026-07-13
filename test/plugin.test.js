@@ -45,6 +45,13 @@ test('renderClientContent outputs a scoped shell and client API fetcher', () => 
   assert.match(html, /bb-channel-attachments/);
   assert.match(html, /bb-channel-attachment-title/);
   assert.match(html, /bb-channel-lucide-file/);
+  assert.match(html, /bb-channel-media-rail/);
+  assert.match(html, /bb-channel-image-viewer/);
+  assert.match(html, /bb-channel-image-track/);
+  assert.match(html, /bb-channel-image-slide/);
+  assert.match(html, /data-bb-media-index/);
+  assert.match(html, /scroll-snap-type:x mandatory/);
+  assert.match(html, /object-fit:contain/);
   assert.match(html, /bb-channel-feed::before/);
   assert.match(html, /bb-channel-tags span/);
   assert.match(html, /bb-channel-card-placeholder/);

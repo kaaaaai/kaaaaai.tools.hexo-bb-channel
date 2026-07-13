@@ -43,10 +43,17 @@ function renderClientScript() {
         }).format(new Date(value));
 
         const renderCard = (post) => {
-          const media = (post.media || [])
-            .filter((item) => item.type === 'image')
-            .map((item) => '<img src="' + escapeHtml(item.src) + '" alt="' + escapeHtml(item.alt || '') + '" loading="lazy" decoding="async">')
-            .join('');
+          const images = (post.media || []).filter((item) => item.type === 'image');
+          const media = images.map((item, index) =>
+            '<button class="bb-channel-media-thumb" type="button" data-bb-media-index="' + index + '" aria-label="View image ' + (index + 1) + '">' +
+              '<img src="' + escapeHtml(item.src) + '" alt="' + escapeHtml(item.alt || '') + '" loading="lazy" decoding="async">' +
+            '</button>'
+          ).join('');
+          const viewerImages = images.map((item) =>
+            '<figure class="bb-channel-image-slide" data-bb-image-slide>' +
+              '<img src="' + escapeHtml(item.src) + '" alt="' + escapeHtml(item.alt || '') + '" loading="lazy" decoding="async">' +
+            '</figure>'
+          ).join('');
           const tags = (post.tags || []).map((tag) => '<span>#' + escapeHtml(tag) + '</span>').join('');
           const attachments = (post.attachments || []).map((item) =>
             '<a class="bb-channel-attachment" href="' + escapeHtml(item.url || (post.source && post.source.telegramUrl) || '#') + '" target="_blank" rel="noopener noreferrer">' +
@@ -64,14 +71,51 @@ function renderClientScript() {
               '<header class="bb-channel-meta">' +
                 '<a class="bb-channel-time" href="' + escapeHtml(post.source && post.source.telegramUrl || '#') + '" target="_blank" rel="noopener noreferrer">' + escapeHtml(formatDate(post.datetime)) + '</a>' +
               '</header>' +
-              '<div class="bb-channel-body">' +
-                (post.html || '') +
-                (attachments ? '<div class="bb-channel-attachments">' + attachments + '</div>' : '') +
-                (media ? '<div class="bb-channel-media">' + media + '</div>' : '') +
-                (tags ? '<footer class="bb-channel-tags">' + tags + '</footer>' : '') +
+              '<div class="bb-channel-body' + (media ? ' bb-channel-body-with-media' : '') + '">' +
+                '<div class="bb-channel-main">' +
+                  (post.html || '') +
+                  (attachments ? '<div class="bb-channel-attachments">' + attachments + '</div>' : '') +
+                  (tags ? '<footer class="bb-channel-tags">' + tags + '</footer>' : '') +
+                '</div>' +
+                (media ? '<div class="bb-channel-media-rail" data-bb-media-rail>' + media + '</div>' : '') +
               '</div>' +
+              (media ? '<div class="bb-channel-image-viewer" data-bb-image-viewer hidden>' +
+                '<button class="bb-channel-image-nav bb-channel-image-prev" type="button" data-bb-image-prev aria-label="Previous image">‹</button>' +
+                '<div class="bb-channel-image-track" data-bb-image-track tabindex="0" aria-label="Image carousel">' + viewerImages + '</div>' +
+                '<button class="bb-channel-image-nav bb-channel-image-next" type="button" data-bb-image-next aria-label="Next image">›</button>' +
+                '<div class="bb-channel-image-count" data-bb-image-count></div>' +
+              '</div>' : '') +
             '</div>' +
           '</section>';
+        };
+
+        const openImageViewer = (card, index) => {
+          const viewer = card.querySelector('[data-bb-image-viewer]');
+          const track = card.querySelector('[data-bb-image-track]');
+          const slides = [...card.querySelectorAll('[data-bb-image-slide]')];
+          const count = card.querySelector('[data-bb-image-count]');
+          if (!viewer || !track || !slides.length) return;
+          const safeIndex = (Number(index) + slides.length) % slides.length;
+          card.dataset.bbImageIndex = String(safeIndex);
+          if (count) count.textContent = slides.length > 1 ? (safeIndex + 1) + ' / ' + slides.length : '';
+          viewer.hidden = false;
+          slides[safeIndex].scrollIntoView({ block: 'nearest', inline: 'start', behavior: 'smooth' });
+          viewer.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        };
+
+        const moveImageViewer = (card, delta) => {
+          const current = Number(card.dataset.bbImageIndex || 0);
+          openImageViewer(card, current + delta);
+        };
+
+        const syncImageViewerIndex = (track) => {
+          const card = track.closest('.bb-channel-card');
+          const slides = [...card.querySelectorAll('[data-bb-image-slide]')];
+          const count = card.querySelector('[data-bb-image-count]');
+          if (!slides.length) return;
+          const nextIndex = Math.max(0, Math.min(slides.length - 1, Math.round(track.scrollLeft / Math.max(1, track.clientWidth))));
+          card.dataset.bbImageIndex = String(nextIndex);
+          if (count) count.textContent = slides.length > 1 ? (nextIndex + 1) + ' / ' + slides.length : '';
         };
 
         const loadPage = async (page = 1) => {
@@ -100,6 +144,32 @@ function renderClientScript() {
           const button = event.target.closest('button[data-page]');
           if (button) loadPage(button.dataset.page).catch((error) => { status.textContent = error.message; });
           });
+          feed.addEventListener('click', (event) => {
+            const thumb = event.target.closest('[data-bb-media-index]');
+            const prev = event.target.closest('[data-bb-image-prev]');
+            const next = event.target.closest('[data-bb-image-next]');
+            const card = event.target.closest('.bb-channel-card');
+            if (!card) return;
+            if (thumb) openImageViewer(card, thumb.dataset.bbMediaIndex);
+            if (prev) moveImageViewer(card, -1);
+            if (next) moveImageViewer(card, 1);
+          });
+          feed.addEventListener('keydown', (event) => {
+            const card = event.target.closest('.bb-channel-card');
+            if (!card || !card.querySelector('[data-bb-image-viewer]:not([hidden])')) return;
+            if (event.key === 'ArrowLeft') {
+              event.preventDefault();
+              moveImageViewer(card, -1);
+            }
+            if (event.key === 'ArrowRight') {
+              event.preventDefault();
+              moveImageViewer(card, 1);
+            }
+          });
+          feed.addEventListener('scroll', (event) => {
+            const track = event.target.closest && event.target.closest('[data-bb-image-track]');
+            if (track) syncImageViewerIndex(track);
+          }, { passive: true, capture: true });
           loadPage().catch((error) => { status.textContent = error.message; });
         });
         window.initBbChannel();
@@ -129,11 +199,25 @@ function renderClientContent(config) {
       .bb-channel-portable .bb-channel-dot{position:absolute;left:-2.16rem;top:1.7rem;z-index:2;width:.56rem;height:.56rem;border-radius:999px;background:#ff7900;box-shadow:0 0 0 .28rem rgba(255,121,0,.12)}
       .bb-channel-portable .bb-channel-meta{display:flex;align-items:center;gap:.7rem;margin:0 0 1.08rem;color:#737373;font-weight:500}
       .bb-channel-portable .bb-channel-time{color:inherit;text-decoration:none;border-bottom:0;font-size:.96rem;line-height:1.3}
+      .bb-channel-portable .bb-channel-body-with-media{display:grid;grid-template-columns:minmax(0,1fr) minmax(9rem,14rem);gap:1.15rem;align-items:start}
+      .bb-channel-portable .bb-channel-main{min-width:0}
       .bb-channel-portable .bb-channel-content{font-size:1rem;line-height:1.78}
       .bb-channel-portable .bb-channel-content p{margin:0 0 .9em}
       .bb-channel-portable .bb-channel-content a{color:#e46f0a;border-bottom:1px solid rgba(228,111,10,.35);text-decoration:none}
-      .bb-channel-portable .bb-channel-media{margin-top:1rem}
-      .bb-channel-portable .bb-channel-media img{display:block;max-width:100%;border:1px solid #e5e5e5;border-radius:10px}
+      .bb-channel-portable .bb-channel-media-rail{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.35rem;justify-self:end;width:min(14rem,100%)}
+      .bb-channel-portable .bb-channel-media-thumb{display:grid;min-height:3.85rem;aspect-ratio:1/1;place-items:center;border:1px solid #e5e5e5;border-radius:8px;background:#fafafa;padding:0;overflow:hidden;cursor:pointer}
+      .bb-channel-portable .bb-channel-media-thumb:focus-visible,.bb-channel-portable .bb-channel-image-nav:focus-visible,.bb-channel-portable .bb-channel-image-track:focus-visible{outline:2px solid rgba(255,121,0,.46);outline-offset:3px}
+      .bb-channel-portable .bb-channel-media-thumb:only-child{aspect-ratio:4/3;grid-column:1/-1}
+      .bb-channel-portable .bb-channel-media-thumb img{display:block;max-width:100%;max-height:100%;width:100%;height:100%;object-fit:contain}
+      .bb-channel-portable .bb-channel-image-viewer{position:relative;margin-top:1.1rem;max-width:min(42rem,100%);touch-action:pan-y}
+      .bb-channel-portable .bb-channel-image-viewer[hidden]{display:none}
+      .bb-channel-portable .bb-channel-image-track{display:flex;gap:.75rem;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;scrollbar-width:thin}
+      .bb-channel-portable .bb-channel-image-slide{display:flex;min-width:100%;margin:0;scroll-snap-align:start;scroll-snap-stop:always}
+      .bb-channel-portable .bb-channel-image-slide img{display:block;width:auto;max-width:100%;max-height:72vh;border:1px solid #e5e5e5;border-radius:10px;background:#fafafa;object-fit:contain}
+      .bb-channel-portable .bb-channel-image-nav{position:absolute;top:50%;display:grid;width:2.75rem;height:2.75rem;place-items:center;transform:translateY(-50%);border:1px solid #e1e1e1;border-radius:999px;background:rgba(255,255,255,.82);color:#555;cursor:pointer}
+      .bb-channel-portable .bb-channel-image-prev{left:.65rem}
+      .bb-channel-portable .bb-channel-image-next{right:.65rem}
+      .bb-channel-portable .bb-channel-image-count{margin-top:.45rem;color:#888;font-size:.82rem}
       .bb-channel-portable .bb-channel-attachments{display:flex;flex-direction:column;gap:.65rem;margin-top:.9rem}
       .bb-channel-portable .bb-channel-attachment{display:flex;align-items:center;gap:.8rem;border:1px solid #e3ddd4;border-radius:10px;background:rgba(250,248,243,.58);padding:.82rem .95rem;color:#333;text-decoration:none;transition:border-color 220ms ease,background-color 220ms ease,box-shadow 220ms ease}
       .bb-channel-portable .bb-channel-attachment:hover{border-color:#d6cbbd;background:rgba(255,252,246,.9);box-shadow:0 8px 22px -20px rgba(15,23,42,.28)}
@@ -147,6 +231,7 @@ function renderClientContent(config) {
       .bb-channel-portable .bb-channel-pagination{display:flex;align-items:center;justify-content:center;gap:3rem;margin-top:1.8rem}
       .bb-channel-portable .bb-channel-pagination button,.bb-channel-portable .bb-channel-pagination span{display:inline-flex;min-width:3.4rem;height:2.15rem;align-items:center;justify-content:center;border:1px solid #e8e8e8;border-radius:7px;color:#777;background:#fff}
       .bb-channel-portable .bb-channel-pagination span{min-width:2.15rem;background:#333;color:#fff;border-color:#333}
+      @media(max-width:720px){.bb-channel-portable .bb-channel-body-with-media{grid-template-columns:1fr}.bb-channel-portable .bb-channel-media-rail{justify-self:start;width:min(18rem,100%)}}
       @media(max-width:640px){.bb-channel-portable .bb-channel-feed{padding-left:1.45rem}.bb-channel-portable .bb-channel-dot{left:-1.5rem}.bb-channel-portable .bb-channel-card-surface{padding:1.1rem 1.05rem}.bb-channel-portable .bb-channel-card:hover .bb-channel-card-surface{transform:translate(3px,-4px)}.bb-channel-portable .bb-channel-title{font-size:1.45rem}}
       @media(prefers-reduced-motion:reduce){.bb-channel-portable .bb-channel-card-placeholder,.bb-channel-portable .bb-channel-card-surface,.bb-channel-portable .bb-channel-attachment{transition:none}.bb-channel-portable .bb-channel-card:hover .bb-channel-card-surface{transform:none}}
     </style>
