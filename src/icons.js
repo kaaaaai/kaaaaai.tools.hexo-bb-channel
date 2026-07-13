@@ -9,6 +9,5 @@ function loadLucideIcon(name, className) {
 }
 
 module.exports = {
-  externalLinkIcon: loadLucideIcon('external-link', 'bb-channel-lucide bb-channel-lucide-external-link'),
   fileIcon: loadLucideIcon('file', 'bb-channel-lucide bb-channel-lucide-file'),
 };

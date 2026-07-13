@@ -1,4 +1,4 @@
-const { externalLinkIcon, fileIcon } = require('./icons');
+const { fileIcon } = require('./icons');
 
 function escapeHtml(value = '') {
   return String(value)
@@ -17,7 +17,6 @@ function renderClientScript() {
     <script data-pjax>
       (() => {
         const bbChannelFileIcon = ${JSON.stringify(fileIcon)};
-        const bbChannelExternalLinkIcon = ${JSON.stringify(externalLinkIcon)};
         window.initBbChannel = window.initBbChannel || (() => {
           const root = document.querySelector('[data-bb-channel-root]');
           if (!root || root.dataset.bbChannelReady === 'true') return;
@@ -56,7 +55,6 @@ function renderClientScript() {
                 '<span class="bb-channel-attachment-title">' + escapeHtml(item.title || 'Attachment') + '</span>' +
                 (item.meta ? '<span class="bb-channel-attachment-meta">' + escapeHtml(item.meta) + '</span>' : '') +
               '</span>' +
-              '<span class="bb-channel-attachment-open">' + bbChannelExternalLinkIcon + '</span>' +
             '</a>'
           ).join('');
           return '<section class="bb-channel-card" id="bb-' + escapeHtml(post.id) + '">' +
@@ -64,7 +62,6 @@ function renderClientScript() {
             '<div class="bb-channel-card-surface">' +
               '<header class="bb-channel-meta">' +
                 '<a class="bb-channel-time" href="' + escapeHtml(post.source && post.source.telegramUrl || '#') + '" target="_blank" rel="noopener noreferrer">' + escapeHtml(formatDate(post.datetime)) + '</a>' +
-                '<span class="bb-channel-card-more" aria-hidden="true">...</span>' +
               '</header>' +
               '<div class="bb-channel-body">' +
                 (post.html || '') +
@@ -129,7 +126,6 @@ function renderClientContent(config) {
       .bb-channel-portable .bb-channel-dot{position:absolute;left:-2.16rem;top:1.7rem;z-index:2;width:.56rem;height:.56rem;border-radius:999px;background:#ff7900;box-shadow:0 0 0 .28rem rgba(255,121,0,.12)}
       .bb-channel-portable .bb-channel-meta{display:flex;align-items:center;gap:.7rem;margin:0 0 1.08rem;color:#737373;font-weight:500}
       .bb-channel-portable .bb-channel-time{color:inherit;text-decoration:none;border-bottom:0;font-size:.96rem;line-height:1.3}
-      .bb-channel-portable .bb-channel-card-more{margin-left:auto;color:#6f6f6f;font-size:1.05rem;font-weight:700;line-height:1;letter-spacing:.08em}
       .bb-channel-portable .bb-channel-content{font-size:1rem;line-height:1.78}
       .bb-channel-portable .bb-channel-content p{margin:0 0 .9em}
       .bb-channel-portable .bb-channel-content a{color:#e46f0a;border-bottom:1px solid rgba(228,111,10,.35);text-decoration:none}
@@ -143,16 +139,13 @@ function renderClientContent(config) {
       .bb-channel-portable .bb-channel-attachment-main{display:flex;min-width:0;flex-direction:column;gap:.12rem}
       .bb-channel-portable .bb-channel-attachment-title{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.95rem;font-weight:600}
       .bb-channel-portable .bb-channel-attachment-meta{color:#888;font-size:.82rem}
-      .bb-channel-portable .bb-channel-attachment-open{display:grid;width:1.4rem;height:1.4rem;place-items:center;margin-left:auto;color:#777;opacity:.72;transition:opacity 220ms ease,transform 220ms ease}
-      .bb-channel-portable .bb-channel-attachment:hover .bb-channel-attachment-open{opacity:.95;transform:translate(1px,-1px)}
-      .bb-channel-portable .bb-channel-attachment-open .bb-channel-lucide{width:.95rem;height:.95rem;stroke-width:2.2}
       .bb-channel-portable .bb-channel-tags{display:flex;flex-wrap:wrap;gap:.55rem;margin-top:.9rem;color:#676767;font-size:.86rem}
       .bb-channel-portable .bb-channel-tags span{display:inline-flex;align-items:center;border:0;border-radius:6px;background:#f3f3f3;padding:.18rem .5rem;line-height:1.5}
       .bb-channel-portable .bb-channel-pagination{display:flex;align-items:center;justify-content:center;gap:3rem;margin-top:1.8rem}
       .bb-channel-portable .bb-channel-pagination button,.bb-channel-portable .bb-channel-pagination span{display:inline-flex;min-width:3.4rem;height:2.15rem;align-items:center;justify-content:center;border:1px solid #e8e8e8;border-radius:7px;color:#777;background:#fff}
       .bb-channel-portable .bb-channel-pagination span{min-width:2.15rem;background:#333;color:#fff;border-color:#333}
       @media(max-width:640px){.bb-channel-portable .bb-channel-feed{padding-left:1.45rem}.bb-channel-portable .bb-channel-dot{left:-1.5rem}.bb-channel-portable .bb-channel-card-surface{padding:1.1rem 1.05rem}.bb-channel-portable .bb-channel-card:hover .bb-channel-card-surface{transform:none}.bb-channel-portable .bb-channel-title{font-size:1.45rem}}
-      @media(prefers-reduced-motion:reduce){.bb-channel-portable .bb-channel-card-surface,.bb-channel-portable .bb-channel-attachment,.bb-channel-portable .bb-channel-attachment-open{transition:none}.bb-channel-portable .bb-channel-card:hover .bb-channel-card-surface,.bb-channel-portable .bb-channel-attachment:hover .bb-channel-attachment-open{transform:none}}
+      @media(prefers-reduced-motion:reduce){.bb-channel-portable .bb-channel-card-surface,.bb-channel-portable .bb-channel-attachment{transition:none}.bb-channel-portable .bb-channel-card:hover .bb-channel-card-surface{transform:none}}
     </style>
     <div class="bb-channel-portable" data-bb-channel-root data-api-base="${escapeHtml(config.apiBase)}" data-page-size="${escapeHtml(config.pageSize)}">
       <header class="bb-channel-intro">

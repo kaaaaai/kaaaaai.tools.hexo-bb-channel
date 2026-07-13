@@ -45,11 +45,12 @@ test('renderClientContent outputs a scoped shell and client API fetcher', () => 
   assert.match(html, /bb-channel-attachments/);
   assert.match(html, /bb-channel-attachment-title/);
   assert.match(html, /bb-channel-lucide-file/);
-  assert.match(html, /bb-channel-lucide-external-link/);
   assert.match(html, /bb-channel-feed::before/);
   assert.match(html, /bb-channel-tags span/);
   assert.doesNotMatch(html, /<h1 class="bb-channel-title"/);
   assert.doesNotMatch(html, /bb-channel-attachment-icon::after/);
+  assert.doesNotMatch(html, /bb-channel-attachment-open/);
+  assert.doesNotMatch(html, /bb-channel-card-more/);
   assert.doesNotMatch(html, /bb-channel-card-placeholder/);
 });
 
