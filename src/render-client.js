@@ -47,13 +47,13 @@ function renderClientScript() {
           const media = images.map((item, index) =>
             '<button class="bb-channel-media-thumb" type="button" data-bb-media-index="' + index + '" aria-label="View image ' + (index + 1) + '">' +
               '<span class="bb-channel-image-skeleton" aria-hidden="true"></span>' +
-              '<img class="bb-channel-media-img" data-bb-img-src="' + escapeHtml(item.src) + '" alt="' + escapeHtml(item.alt || '') + '" loading="lazy" decoding="async">' +
+              '<img class="bb-channel-media-img" data-bb-image-url="' + escapeHtml(item.src) + '" alt="' + escapeHtml(item.alt || '') + '" loading="lazy" decoding="async">' +
             '</button>'
           ).join('');
           const viewerImages = images.map((item) =>
             '<figure class="bb-channel-image-slide" data-bb-image-slide>' +
               '<span class="bb-channel-image-skeleton" aria-hidden="true"></span>' +
-              '<img class="bb-channel-image-large" data-bb-img-src="' + escapeHtml(item.src) + '" alt="' + escapeHtml(item.alt || '') + '" loading="lazy" decoding="async">' +
+              '<img class="bb-channel-image-large" data-bb-image-url="' + escapeHtml(item.src) + '" alt="' + escapeHtml(item.alt || '') + '" loading="lazy" decoding="async">' +
             '</figure>'
           ).join('');
           const carousel = images.length > 1;
@@ -131,7 +131,7 @@ function renderClientScript() {
         };
 
         const hydrateImages = (scope) => {
-          scope.querySelectorAll('img[data-bb-img-src]').forEach((img) => {
+          scope.querySelectorAll('img[data-bb-image-url]').forEach((img) => {
             if (img.dataset.bbHydrated === 'true') return;
             const holder = img.closest('.bb-channel-media-thumb,.bb-channel-image-slide');
             img.dataset.bbHydrated = 'true';
@@ -141,7 +141,7 @@ function renderClientScript() {
             img.addEventListener('error', () => {
               if (holder) holder.dataset.bbLoaded = 'error';
             }, { once: true });
-            img.src = img.dataset.bbImgSrc;
+            img.src = img.dataset.bbImageUrl;
           });
         };
 
