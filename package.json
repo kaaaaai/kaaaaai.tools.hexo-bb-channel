@@ -1,0 +1,25 @@
+{
+  "name": "hexo-bb-channel",
+  "version": "0.1.0",
+  "description": "Render Telegram channel microblog timelines in Hexo using a dynamic API backend.",
+  "main": "index.js",
+  "files": [
+    "index.js",
+    "src",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "test": "node --test test/*.test.js"
+  },
+  "keywords": [
+    "hexo",
+    "hexo-plugin",
+    "telegram",
+    "microblog"
+  ],
+  "peerDependencies": {
+    "hexo": ">=6"
+  },
+  "devDependencies": {}
+}
