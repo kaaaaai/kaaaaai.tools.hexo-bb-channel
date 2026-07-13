@@ -33,7 +33,7 @@ bb_channel:
   route: bb/
   title: 闲言碎语
   description: 这些片段可能来自于大脑皮层短暂兴奋后的捕捉 🤏
-  api_base: https://your-tg-channel-api.vercel.app
+  api_base: https://your-channel-api.vercel.app
   page_size: 20
 ```
 
@@ -56,7 +56,7 @@ Hexo /bb/
 Browser
   fetches api_base/api/posts?page=1&page_size=20
 
-tg-channel-api
+kaaaaai.tools.channel-api
   fetches Telegram public web pages
   parses and sanitizes posts
   caches payload in Upstash Redis
@@ -71,7 +71,7 @@ tg-channel-api
 | `route` | `bb/` | Output route. |
 | `title` | `moments` | Page title rendered inside the content shell. |
 | `description` | empty | Page description rendered under the title. |
-| `api_base` | empty | Base URL of the deployed `tg-channel-api`. |
+| `api_base` | empty | Base URL of the deployed `kaaaaai.tools.channel-api`. |
 | `page_size` | `20` | Posts requested per API page. |
 
 ## Notes
