@@ -45,6 +45,15 @@ function renderClientScript() {
             .map((item) => '<img src="' + escapeHtml(item.src) + '" alt="' + escapeHtml(item.alt || '') + '" loading="lazy" decoding="async">')
             .join('');
           const tags = (post.tags || []).map((tag) => '<span>#' + escapeHtml(tag) + '</span>').join('');
+          const attachments = (post.attachments || []).map((item) =>
+            '<a class="bb-channel-attachment" href="' + escapeHtml(item.url || (post.source && post.source.telegramUrl) || '#') + '" target="_blank" rel="noopener noreferrer">' +
+              '<span class="bb-channel-attachment-icon" aria-hidden="true"></span>' +
+              '<span class="bb-channel-attachment-main">' +
+                '<span class="bb-channel-attachment-title">' + escapeHtml(item.title || 'Attachment') + '</span>' +
+                (item.meta ? '<span class="bb-channel-attachment-meta">' + escapeHtml(item.meta) + '</span>' : '') +
+              '</span>' +
+            '</a>'
+          ).join('');
           return '<section class="bb-channel-card" id="bb-' + escapeHtml(post.id) + '">' +
             '<span class="bb-channel-card-placeholder" aria-hidden="true"></span>' +
             '<div class="bb-channel-card-surface">' +
@@ -55,6 +64,7 @@ function renderClientScript() {
               '</header>' +
               '<div class="bb-channel-body">' +
                 (post.html || '') +
+                (attachments ? '<div class="bb-channel-attachments">' + attachments + '</div>' : '') +
                 (media ? '<div class="bb-channel-media">' + media + '</div>' : '') +
                 (tags ? '<footer class="bb-channel-tags">' + tags + '</footer>' : '') +
               '</div>' +
@@ -121,6 +131,14 @@ function renderClientContent(config) {
       .bb-channel-portable .bb-channel-content p{margin:0 0 1.15em}
       .bb-channel-portable .bb-channel-media{margin-top:1rem}
       .bb-channel-portable .bb-channel-media img{display:block;max-width:100%;border:1px solid #ddd;border-radius:10px}
+      .bb-channel-portable .bb-channel-attachments{display:flex;flex-direction:column;gap:.65rem;margin-top:1rem}
+      .bb-channel-portable .bb-channel-attachment{display:flex;align-items:center;gap:.75rem;border:1px solid #e5e0d8;border-radius:10px;background:rgba(250,248,243,.72);padding:.8rem .9rem;color:#333;text-decoration:none}
+      .bb-channel-portable .bb-channel-attachment:hover{border-color:#d7cbbb;background:rgba(255,252,245,.92)}
+      .bb-channel-portable .bb-channel-attachment-icon{width:2.1rem;height:2.1rem;flex:0 0 auto;border-radius:8px;background:linear-gradient(135deg,#f0a33b,#d96c1c);position:relative}
+      .bb-channel-portable .bb-channel-attachment-icon::after{content:"";position:absolute;left:.62rem;top:.5rem;width:.85rem;height:1.05rem;border:2px solid rgba(255,255,255,.9);border-radius:2px}
+      .bb-channel-portable .bb-channel-attachment-main{display:flex;min-width:0;flex-direction:column;gap:.12rem}
+      .bb-channel-portable .bb-channel-attachment-title{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.95rem;font-weight:600}
+      .bb-channel-portable .bb-channel-attachment-meta{color:#888;font-size:.82rem}
       .bb-channel-portable .bb-channel-tags{display:flex;flex-wrap:wrap;gap:.55rem;margin-top:1rem;color:#777;font-size:.88rem}
       .bb-channel-portable .bb-channel-tags span{border-bottom:1px dotted #aaa}
       .bb-channel-portable .bb-channel-pagination{display:flex;align-items:center;justify-content:center;gap:3rem;margin-top:1.8rem}

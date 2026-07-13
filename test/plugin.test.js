@@ -42,6 +42,8 @@ test('renderClientContent outputs a scoped shell and client API fetcher', () => 
   assert.match(html, /fetch\(url\.toString\(\)/);
   assert.match(html, /data-pjax/);
   assert.match(html, /window\.initBbChannel/);
+  assert.match(html, /bb-channel-attachments/);
+  assert.match(html, /bb-channel-attachment-title/);
   assert.match(html, /bb-channel-card-placeholder/);
   assert.doesNotMatch(html, /<h1 class="bb-channel-title"/);
 });
