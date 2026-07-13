@@ -53,6 +53,8 @@ test('renderClientContent outputs a scoped shell and client API fetcher', () => 
   assert.match(html, /data-bb-image-url/);
   assert.match(html, /bb-channel-image-large/);
   assert.match(html, /data-bb-viewer-open/);
+  assert.match(html, /data-bb-viewer-closing/);
+  assert.match(html, /bbViewerClosing/);
   assert.match(html, /data-bb-media-index/);
   assert.match(html, /hydrateImages/);
   assert.match(html, /scroll-snap-type:x mandatory/);
@@ -60,11 +62,14 @@ test('renderClientContent outputs a scoped shell and client API fetcher', () => 
   assert.match(html, /border:1px dashed #d9d9d9/);
   assert.match(html, /aspect-ratio:16\/10/);
   assert.match(html, /cursor:zoom-out/);
+  assert.match(html, /transform:translateY\(14px\)/);
+  assert.match(html, /transition:opacity 420ms cubic-bezier\(\.22,1,\.36,1\),transform 420ms cubic-bezier\(\.22,1,\.36,1\)/);
   assert.match(html, /@media\(max-width:640px\)/);
   assert.match(html, /justify-self:center/);
   assert.match(html, /bb-channel-feed::before/);
   assert.match(html, /bb-channel-tags span/);
   assert.match(html, /bb-channel-card-placeholder/);
+  assert.doesNotMatch(html, /data-bb-viewer-open="true"\] \.bb-channel-media-rail\{display:none\}/);
   assert.doesNotMatch(html, /<h1 class="bb-channel-title"/);
   assert.doesNotMatch(html, /bb-channel-attachment-icon::after/);
   assert.doesNotMatch(html, /bb-channel-attachment-open/);
