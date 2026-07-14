@@ -188,7 +188,7 @@ function renderClientScript() {
             const thumb = event.target.closest('[data-bb-media-index]');
             const prev = event.target.closest('[data-bb-image-prev]');
             const next = event.target.closest('[data-bb-image-next]');
-            const large = event.target.closest('[data-bb-image-large]');
+            const large = event.target.closest('.bb-channel-image-large');
             const card = event.target.closest('.bb-channel-card');
             if (!card) return;
             if (large) {
