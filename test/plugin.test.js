@@ -58,11 +58,16 @@ test('renderClientContent outputs a scoped shell and client API fetcher', () => 
   assert.match(html, /bbViewerClosing/);
   assert.match(html, /data-bb-media-index/);
   assert.match(html, /hydrateImages/);
+  assert.match(html, /track\.scrollTo/);
+  assert.doesNotMatch(html, /scrollIntoView/);
   assert.match(html, /scroll-snap-type:x mandatory/);
   assert.match(html, /object-fit:contain/);
   assert.match(html, /border:1px dashed #d9d9d9/);
   assert.match(html, /aspect-ratio:16\/10/);
   assert.match(html, /cursor:zoom-out/);
+  assert.match(html, /max-height:0/);
+  assert.match(html, /max-height:calc\(68vh \+ 4rem\)/);
+  assert.match(html, /overflow:hidden/);
   assert.match(html, /transform:translateY\(14px\)/);
   assert.match(html, /transition:opacity 420ms cubic-bezier\(\.22,1,\.36,1\),transform 420ms cubic-bezier\(\.22,1,\.36,1\)/);
   assert.match(html, /@media\(max-width:640px\)/);
