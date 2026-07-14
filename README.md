@@ -13,6 +13,12 @@ English | [Chinese](./README.zh-CN.md)
 
 Live sample: [https://www.kaaaaai.cn/bb/](https://www.kaaaaai.cn/bb/)
 
+## Preview
+
+Live demo: [https://www.kaaaaai.cn/bb/](https://www.kaaaaai.cn/bb/)
+
+![Hexo BB Channel desktop preview](./docs/assets/preview-desktop.png)
+
 ## Why This Design
 
 - **Theme-agnostic**: works through Hexo's generator system, so it can be used with NexT, Wizarding, or most other themes.

@@ -13,6 +13,12 @@
 
 在线示例：[https://www.kaaaaai.cn/bb/](https://www.kaaaaai.cn/bb/)
 
+## 效果预览
+
+在线示例：[https://www.kaaaaai.cn/bb/](https://www.kaaaaai.cn/bb/)
+
+![Hexo BB Channel 桌面端预览](./docs/assets/preview-desktop.png)
+
 ## 为什么这样设计
 
 - **主题无关**：通过 Hexo generator 输出页面，NexT、Wizarding 以及大部分主题都可以接入。
