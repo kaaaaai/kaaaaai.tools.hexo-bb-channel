@@ -69,7 +69,9 @@ test('renderClientContent outputs a scoped shell and client API fetcher', () => 
   assert.match(html, /max-height:calc\(68vh \+ 4rem\)/);
   assert.match(html, /overflow:hidden/);
   assert.match(html, /transform:translateY\(14px\)/);
-  assert.match(html, /transition:opacity 420ms cubic-bezier\(\.22,1,\.36,1\),transform 420ms cubic-bezier\(\.22,1,\.36,1\)/);
+  assert.match(html, /transition:max-height 420ms cubic-bezier\(\.22,1,\.36,1\),opacity 420ms cubic-bezier\(\.22,1,\.36,1\),transform 420ms cubic-bezier\(\.22,1,\.36,1\)/);
+  assert.match(html, /data-bb-viewer-open="true"\] \.bb-channel-media-rail\{max-height:0;opacity:0/);
+  assert.match(html, /data-bb-viewer-open="true"\] \.bb-channel-image-viewer\{margin-top:\.7rem/);
   assert.match(html, /@media\(max-width:640px\)/);
   assert.match(html, /justify-self:center/);
   assert.match(html, /bb-channel-feed::before/);
