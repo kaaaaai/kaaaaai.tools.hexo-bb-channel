@@ -56,6 +56,8 @@ test('renderClientContent outputs a scoped shell and client API fetcher', () => 
   assert.match(html, /data-bb-viewer-open/);
   assert.match(html, /data-bb-viewer-closing/);
   assert.match(html, /bbViewerClosing/);
+  assert.match(html, /preserveCardViewportPosition/);
+  assert.match(html, /focus\(\{ preventScroll: true \}\)/);
   assert.match(html, /data-bb-media-index/);
   assert.match(html, /hydrateImages/);
   assert.match(html, /track\.scrollTo/);

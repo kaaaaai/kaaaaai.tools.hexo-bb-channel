@@ -92,6 +92,28 @@ function renderClientScript() {
           '</section>';
         };
 
+        const focusWithoutScroll = (element) => {
+          if (!element || typeof element.focus !== 'function') return;
+          try {
+            element.focus({ preventScroll: true });
+          } catch (error) {
+            element.focus();
+          }
+        };
+
+        const preserveCardViewportPosition = (card, update) => {
+          const initialTop = card.getBoundingClientRect().top;
+          update();
+          const restore = () => {
+            const delta = card.getBoundingClientRect().top - initialTop;
+            if (Math.abs(delta) > 0.5) window.scrollBy(0, delta);
+          };
+          requestAnimationFrame(() => {
+            restore();
+            requestAnimationFrame(restore);
+          });
+        };
+
         const openImageViewer = (card, index) => {
           const viewer = card.querySelector('[data-bb-image-viewer]');
           const track = card.querySelector('[data-bb-image-track]');
@@ -101,28 +123,35 @@ function renderClientScript() {
           const safeIndex = (Number(index) + slides.length) % slides.length;
           card.dataset.bbImageIndex = String(safeIndex);
           if (count) count.textContent = slides.length > 1 ? (safeIndex + 1) + ' / ' + slides.length : '';
-          window.clearTimeout(card.bbViewerCloseTimer);
-          delete card.dataset.bbViewerClosing;
-          viewer.hidden = false;
-          hydrateImages(slides[safeIndex]);
-          requestAnimationFrame(() => {
-            card.dataset.bbViewerOpen = 'true';
-            track.scrollTo({ left: track.clientWidth * safeIndex, behavior: 'smooth' });
+          preserveCardViewportPosition(card, () => {
+            window.clearTimeout(card.bbViewerCloseTimer);
+            delete card.dataset.bbViewerClosing;
+            viewer.hidden = false;
+            hydrateImages(slides[safeIndex]);
+            requestAnimationFrame(() => {
+              card.dataset.bbViewerOpen = 'true';
+              track.scrollTo({ left: track.clientWidth * safeIndex, behavior: 'smooth' });
+              focusWithoutScroll(track);
+            });
           });
         };
 
         const closeImageViewer = (card) => {
           const viewer = card.querySelector('[data-bb-image-viewer]');
           if (!viewer || viewer.hidden || card.dataset.bbViewerClosing === 'true') return;
-          card.dataset.bbViewerClosing = 'true';
-          delete card.dataset.bbViewerOpen;
-          window.clearTimeout(card.bbViewerCloseTimer);
-          const finishClose = () => {
-            if (card.dataset.bbViewerClosing !== 'true' || card.dataset.bbViewerOpen === 'true') return;
-            viewer.hidden = true;
-            delete card.dataset.bbViewerClosing;
-          };
-          card.bbViewerCloseTimer = window.setTimeout(finishClose, 460);
+          preserveCardViewportPosition(card, () => {
+            const thumb = card.querySelector('[data-bb-media-index="' + (card.dataset.bbImageIndex || '0') + '"]');
+            card.dataset.bbViewerClosing = 'true';
+            delete card.dataset.bbViewerOpen;
+            focusWithoutScroll(thumb);
+            window.clearTimeout(card.bbViewerCloseTimer);
+            const finishClose = () => {
+              if (card.dataset.bbViewerClosing !== 'true' || card.dataset.bbViewerOpen === 'true') return;
+              viewer.hidden = true;
+              delete card.dataset.bbViewerClosing;
+            };
+            card.bbViewerCloseTimer = window.setTimeout(finishClose, 460);
+          });
         };
 
         const moveImageViewer = (card, delta) => {
