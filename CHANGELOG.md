@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.1.3 - 2026-07-20
+
+### Fixed
+
+- Unified card hover and mobile auto-active styling so both states use the same transition timing, offset, border, background, and shadow behavior.
+- Kept active-card placeholder outlines visible on mobile while image viewer open states still suppress the card offset.
+
+### Changed
+
+- Exposed card interaction tokens as CSS variables so themes can tune the visual style without overriding plugin state selectors.
+
 ## 0.1.2 - 2026-07-20
 
 ### Fixed
@@ -13,4 +24,3 @@
 
 - Mobile card active styling now works without hover and keeps the original dashed placeholder visible.
 - Image carousel positioning uses non-smooth initial placement to avoid jumpy first-open behavior.
-
