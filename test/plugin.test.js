@@ -64,8 +64,11 @@ test('renderClientContent outputs a scoped shell and client API fetcher', () => 
   assert.match(html, /--bb-card-offset-y:-6px/);
   assert.match(html, /--bb-card-mobile-offset-x:4px/);
   assert.match(html, /--bb-card-mobile-offset-y:-5px/);
-  assert.match(html, /bb-channel-card:hover \.bb-channel-card-placeholder,\.bb-channel-portable \.bb-channel-card\[data-bb-card-active="true"\] \.bb-channel-card-placeholder\{opacity:1\}/);
-  assert.match(html, /bb-channel-card:hover \.bb-channel-card-surface,\.bb-channel-portable \.bb-channel-card\[data-bb-card-active="true"\] \.bb-channel-card-surface\{transform:translate\(var\(--bb-card-offset-x\),var\(--bb-card-offset-y\)\)/);
+  assert.match(html, /bb-channel-card\[data-bb-card-active="true"\] \.bb-channel-card-placeholder\{opacity:1\}/);
+  assert.match(html, /bb-channel-card\[data-bb-card-active="true"\] \.bb-channel-card-surface\{transform:translate\(var\(--bb-card-offset-x\),var\(--bb-card-offset-y\)\)/);
+  assert.match(html, /@media\(hover:hover\) and \(pointer:fine\)\{\.bb-channel-portable \.bb-channel-card:hover \.bb-channel-card-placeholder\{opacity:1\}/);
+  assert.match(html, /@media\(hover:hover\) and \(pointer:fine\).*\.bb-channel-portable \.bb-channel-card:hover \.bb-channel-card-surface\{transform:translate\(var\(--bb-card-offset-x\),var\(--bb-card-offset-y\)\)/);
+  assert.doesNotMatch(html, /bb-channel-card:hover \.bb-channel-card-placeholder,\.bb-channel-portable \.bb-channel-card\[data-bb-card-active="true"\]/);
   assert.match(html, /@media\(max-width:640px\).*--bb-card-offset-x:var\(--bb-card-mobile-offset-x\).*--bb-card-offset-y:var\(--bb-card-mobile-offset-y\)/);
   assert.match(html, /closest\('\.bb-channel-image-large'\)/);
   assert.match(html, /data-bb-viewer-open/);
