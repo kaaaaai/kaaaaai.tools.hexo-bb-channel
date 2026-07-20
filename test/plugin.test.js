@@ -52,6 +52,10 @@ test('renderClientContent outputs a scoped shell and client API fetcher', () => 
   assert.match(html, /bb-channel-image-skeleton/);
   assert.match(html, /data-bb-image-url/);
   assert.match(html, /bb-channel-image-large/);
+  assert.match(html, /font-family:var\(--font-serif,inherit\)/);
+  assert.match(html, /letter-spacing:0/);
+  assert.match(html, /letter-spacing:\.01em/);
+  assert.match(html, /text-rendering:optimizeLegibility/);
   assert.match(html, /closest\('\.bb-channel-image-large'\)/);
   assert.match(html, /data-bb-viewer-open/);
   assert.match(html, /data-bb-viewer-closing/);
