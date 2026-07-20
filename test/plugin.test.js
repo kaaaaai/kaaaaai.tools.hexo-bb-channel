@@ -52,7 +52,10 @@ test('renderClientContent outputs a scoped shell and client API fetcher', () => 
   assert.match(html, /bb-channel-image-skeleton/);
   assert.match(html, /data-bb-image-url/);
   assert.match(html, /bb-channel-image-large/);
-  assert.match(html, /font-family:var\(--font-serif,inherit\)/);
+  assert.match(html, /font-family:var\(--bb-channel-title-font,inherit\)/);
+  assert.match(html, /font-size:1\.72rem/);
+  assert.doesNotMatch(html, /font-size:clamp\(2rem,4\.8vw,3\.5rem\)/);
+  assert.match(html, /font-family:var\(--bb-channel-content-font,inherit\)/);
   assert.match(html, /letter-spacing:0/);
   assert.match(html, /letter-spacing:\.01em/);
   assert.match(html, /text-rendering:optimizeLegibility/);
