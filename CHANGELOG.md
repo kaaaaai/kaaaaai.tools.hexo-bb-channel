@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.4 - 2026-07-20
+
+### Fixed
+
+- Prevented touch browsers from showing two visually selected cards by limiting hover card styling to pointer devices and keeping mobile selection driven only by the active-card state.
+
 ## 0.1.3 - 2026-07-20
 
 ### Fixed
