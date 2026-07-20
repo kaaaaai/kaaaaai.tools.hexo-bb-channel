@@ -1,9 +1,12 @@
 const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const path = require('node:path');
 const { test } = require('node:test');
 
 const { resolveConfig } = require('../src/config');
 const { createBbPages } = require('../src/generator');
 const { renderClientContent } = require('../src/render-client');
+const { extractReleaseNotes } = require('../src/release-notes');
 
 test('resolveConfig keeps Hexo integration dynamic by default', () => {
   const config = resolveConfig({
@@ -138,4 +141,31 @@ test('createBbPages generates a single dynamic route page', () => {
   assert.equal(pages[0].data.title, 'moments');
   assert.equal(pages[0].data.comments, true);
   assert.match(pages[0].data.content, /bb-channel-root/);
+});
+
+test('extractReleaseNotes returns the requested changelog section', () => {
+  const notes = extractReleaseNotes(`# Changelog
+
+## 0.2.0 - 2026-07-20
+
+### Fixed
+
+- A focused fix.
+
+## 0.1.0 - 2026-07-19
+
+- Older change.
+`, '0.2.0');
+
+  assert.match(notes, /### Fixed/);
+  assert.match(notes, /A focused fix/);
+  assert.doesNotMatch(notes, /Older change/);
+});
+
+test('publish workflow creates the GitHub release from changelog notes', () => {
+  const workflow = fs.readFileSync(path.join(__dirname, '..', '.github', 'workflows', 'publish.yml'), 'utf8');
+
+  assert.match(workflow, /contents: write/);
+  assert.match(workflow, /node tools\/release-notes\.js > release-notes\.md/);
+  assert.match(workflow, /gh release create "\$RELEASE_TAG" --title "hexo-bb-channel \$RELEASE_TAG" --notes-file release-notes\.md/);
 });

@@ -6,7 +6,7 @@ on:
       - 'v*'
 
 permissions:
-  contents: read
+  contents: write
   id-token: write
 
 jobs:
@@ -47,3 +47,11 @@ jobs:
         run: |
           unset NODE_AUTH_TOKEN
           npm publish --provenance --registry=https://registry.npmjs.org
+
+      - name: Create GitHub release
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          node tools/release-notes.js > release-notes.md
+          gh release create "$RELEASE_TAG" --title "hexo-bb-channel $RELEASE_TAG" --notes-file release-notes.md
