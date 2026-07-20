@@ -140,6 +140,25 @@ function renderClientScript() {
           return width * height;
         };
 
+        const calculateCardVisibleRatio = (card) => {
+          const surface = card.querySelector('.bb-channel-card-surface') || card;
+          const rect = surface.getBoundingClientRect();
+          const area = calculateCardVisibleArea(card);
+          const total = Math.max(1, rect.width * rect.height);
+          return area / total;
+        };
+
+        const calculateCardActiveDistance = (card) => {
+          const surface = card.querySelector('.bb-channel-card-surface') || card;
+          const rect = surface.getBoundingClientRect();
+          const viewportHeight = window.innerHeight || document.documentElement.clientHeight || 0;
+          const viewportActiveLine = viewportHeight * .52;
+          const visibleTop = Math.max(rect.top, 0);
+          const visibleBottom = Math.min(rect.bottom, viewportHeight);
+          const visibleCenter = (visibleTop + visibleBottom) / 2;
+          return Math.abs(visibleCenter - viewportActiveLine);
+        };
+
         const activateLargestVisibleCard = () => {
           bbActiveCardRaf = 0;
           if (!bbActiveCardQuery || !bbActiveCardQuery.matches) {
@@ -147,16 +166,22 @@ function renderClientScript() {
             return;
           }
           let activeCard = null;
-          let activeArea = 0;
+          let bestDistance = Infinity;
+          let bestRatio = 0;
           feed.querySelectorAll('.bb-channel-card').forEach((card) => {
-            const area = card.dataset.bbViewerOpen === 'true' ? 0 : calculateCardVisibleArea(card);
-            if (area > activeArea) {
-              activeArea = area;
+            if (card.dataset.bbViewerOpen === 'true') return;
+            const visibleArea = calculateCardVisibleArea(card);
+            const visibleRatio = calculateCardVisibleRatio(card);
+            if (visibleArea <= 0 || visibleRatio < .08) return;
+            const distance = calculateCardActiveDistance(card);
+            if (distance < bestDistance || (Math.abs(distance - bestDistance) < 1 && visibleRatio > bestRatio)) {
+              bestDistance = distance;
+              bestRatio = visibleRatio;
               activeCard = card;
             }
           });
           feed.querySelectorAll('.bb-channel-card').forEach((card) => {
-            if (card === activeCard && activeArea > 0) {
+            if (card === activeCard) {
               card.dataset.bbCardActive = 'true';
             } else {
               delete card.dataset.bbCardActive;
@@ -372,7 +397,7 @@ function renderClientContent(config) {
       .bb-channel-portable .bb-channel-status{min-height:1.2rem;margin:.4rem 0 .8rem;color:#999}
       .bb-channel-portable .bb-channel-feed{position:relative;display:flex;flex-direction:column;gap:1.05rem;padding-left:2.1rem}
       .bb-channel-portable .bb-channel-feed::before{content:"";position:absolute;left:.22rem;top:.25rem;bottom:.25rem;width:1px;background:linear-gradient(to bottom,rgba(226,226,226,0),#e2e2e2 1.2rem,#e2e2e2 calc(100% - 1.2rem),rgba(226,226,226,0))}
-      .bb-channel-portable .bb-channel-card{position:relative;border-radius:14px}
+      .bb-channel-portable .bb-channel-card{position:relative;border-radius:14px;transition:transform 320ms cubic-bezier(.22,1,.36,1)}
       .bb-channel-portable .bb-channel-card-placeholder{pointer-events:none;position:absolute;inset:0;border:1px dashed #d9d9d9;border-radius:14px;background:rgba(255,255,255,.2);opacity:0;transition:opacity 320ms cubic-bezier(.22,1,.36,1)}
       .bb-channel-portable .bb-channel-card-surface{position:relative;z-index:1;border:1px dashed #d9d9d9;border-radius:14px;background:rgba(255,255,255,.66);padding:1.45rem 1.65rem;box-shadow:none;transition:border-color 320ms cubic-bezier(.22,1,.36,1),background-color 320ms cubic-bezier(.22,1,.36,1),box-shadow 320ms cubic-bezier(.22,1,.36,1),transform 320ms cubic-bezier(.22,1,.36,1)}
       .bb-channel-portable .bb-channel-card:hover .bb-channel-card-placeholder{opacity:1}
@@ -423,8 +448,8 @@ function renderClientContent(config) {
       .bb-channel-portable .bb-channel-pagination span{min-width:2.15rem;background:#333;color:#fff;border-color:#333}
       @media(max-width:720px){.bb-channel-portable .bb-channel-body-with-media{grid-template-columns:1fr}.bb-channel-portable .bb-channel-media-rail{justify-self:start;width:min(18rem,100%)}}
       @keyframes bb-channel-shimmer{0%{background-position:180% 0}100%{background-position:-80% 0}}
-      @media(max-width:640px){.bb-channel-portable .bb-channel-intro{margin-bottom:1.2rem}.bb-channel-portable .bb-channel-title{font-size:1.45rem}.bb-channel-portable .bb-channel-intro-text{font-size:.94rem}.bb-channel-portable .bb-channel-feed{gap:.9rem;padding-left:1.15rem}.bb-channel-portable .bb-channel-feed::before{left:.06rem}.bb-channel-portable .bb-channel-dot{left:-1.32rem;top:1.42rem}.bb-channel-portable .bb-channel-card-surface{padding:1.05rem .95rem;border-radius:12px}.bb-channel-portable .bb-channel-card-placeholder{border-radius:12px}.bb-channel-portable .bb-channel-card:hover .bb-channel-card-surface{transform:none}.bb-channel-portable .bb-channel-card[data-bb-card-active="true"] .bb-channel-card-surface{transform:translate(3px,-4px);border-style:solid;border-color:#e7b99d;background:rgba(255,255,255,.86);box-shadow:0 12px 26px -24px rgba(15,23,42,.32)}.bb-channel-portable .bb-channel-card[data-bb-viewer-open="true"] .bb-channel-card-surface{transform:none}.bb-channel-portable .bb-channel-meta{margin-bottom:.85rem}.bb-channel-portable .bb-channel-content{font-size:.96rem;line-height:1.72}.bb-channel-portable .bb-channel-media-rail{width:100%;max-width:20rem;grid-template-columns:repeat(3,minmax(0,1fr));justify-self:center;margin-top:.15rem}.bb-channel-portable .bb-channel-media-thumb{min-height:4.1rem}.bb-channel-portable .bb-channel-image-viewer{margin-top:.95rem;max-width:100%}.bb-channel-portable .bb-channel-image-slide{min-height:10rem}.bb-channel-portable .bb-channel-image-large{max-width:100%!important;max-height:68vh!important}.bb-channel-portable .bb-channel-image-nav{width:2.55rem;height:2.55rem}.bb-channel-portable .bb-channel-image-prev{left:.45rem}.bb-channel-portable .bb-channel-image-next{right:.45rem}.bb-channel-portable .bb-channel-attachment{align-items:flex-start;padding:.78rem .82rem}.bb-channel-portable .bb-channel-attachment-title{white-space:normal;overflow-wrap:anywhere}.bb-channel-portable .bb-channel-tags{gap:.42rem}.bb-channel-portable .bb-channel-pagination{gap:1rem}}
-      @media(prefers-reduced-motion:reduce){.bb-channel-portable .bb-channel-card-placeholder,.bb-channel-portable .bb-channel-card-surface,.bb-channel-portable .bb-channel-media-rail,.bb-channel-portable .bb-channel-image-viewer,.bb-channel-portable .bb-channel-image-large,.bb-channel-portable .bb-channel-attachment{transition:none}.bb-channel-portable .bb-channel-card:hover .bb-channel-card-surface,.bb-channel-portable .bb-channel-card[data-bb-card-active="true"] .bb-channel-card-surface{transform:none}}
+      @media(max-width:640px){.bb-channel-portable .bb-channel-intro{margin-bottom:1.2rem}.bb-channel-portable .bb-channel-title{font-size:1.45rem}.bb-channel-portable .bb-channel-intro-text{font-size:.94rem}.bb-channel-portable .bb-channel-feed{gap:.9rem;padding-left:1.15rem}.bb-channel-portable .bb-channel-feed::before{left:.06rem}.bb-channel-portable .bb-channel-dot{left:-1.32rem;top:1.42rem}.bb-channel-portable .bb-channel-card[data-bb-card-active="true"]{transform:translate(4px,-5px)}.bb-channel-portable .bb-channel-card[data-bb-viewer-open="true"]{transform:none}.bb-channel-portable .bb-channel-card-surface{padding:1.05rem .95rem;border-radius:12px}.bb-channel-portable .bb-channel-card-placeholder{border-radius:12px}.bb-channel-portable .bb-channel-card:hover .bb-channel-card-surface{transform:none}.bb-channel-portable .bb-channel-card[data-bb-card-active="true"] .bb-channel-card-surface{border-style:solid;border-color:#e7b99d;background:rgba(255,255,255,.86);box-shadow:0 12px 26px -24px rgba(15,23,42,.32)}.bb-channel-portable .bb-channel-card[data-bb-viewer-open="true"] .bb-channel-card-surface{transform:none}.bb-channel-portable .bb-channel-meta{margin-bottom:.85rem}.bb-channel-portable .bb-channel-content{font-size:.96rem;line-height:1.72}.bb-channel-portable .bb-channel-media-rail{width:100%;max-width:20rem;grid-template-columns:repeat(3,minmax(0,1fr));justify-self:center;margin-top:.15rem}.bb-channel-portable .bb-channel-media-thumb{min-height:4.1rem}.bb-channel-portable .bb-channel-image-viewer{margin-top:.95rem;max-width:100%}.bb-channel-portable .bb-channel-image-slide{min-height:10rem}.bb-channel-portable .bb-channel-image-large{max-width:100%!important;max-height:68vh!important}.bb-channel-portable .bb-channel-image-nav{width:2.55rem;height:2.55rem}.bb-channel-portable .bb-channel-image-prev{left:.45rem}.bb-channel-portable .bb-channel-image-next{right:.45rem}.bb-channel-portable .bb-channel-attachment{align-items:flex-start;padding:.78rem .82rem}.bb-channel-portable .bb-channel-attachment-title{white-space:normal;overflow-wrap:anywhere}.bb-channel-portable .bb-channel-tags{gap:.42rem}.bb-channel-portable .bb-channel-pagination{gap:1rem}}
+      @media(prefers-reduced-motion:reduce){.bb-channel-portable .bb-channel-card,.bb-channel-portable .bb-channel-card-placeholder,.bb-channel-portable .bb-channel-card-surface,.bb-channel-portable .bb-channel-media-rail,.bb-channel-portable .bb-channel-image-viewer,.bb-channel-portable .bb-channel-image-large,.bb-channel-portable .bb-channel-attachment{transition:none}.bb-channel-portable .bb-channel-card:hover .bb-channel-card-surface,.bb-channel-portable .bb-channel-card[data-bb-card-active="true"],.bb-channel-portable .bb-channel-card[data-bb-card-active="true"] .bb-channel-card-surface{transform:none}}
     </style>
     <div class="bb-channel-portable" data-bb-channel-root data-api-base="${escapeHtml(config.apiBase)}" data-page-size="${escapeHtml(config.pageSize)}">
       <header class="bb-channel-intro">

@@ -71,9 +71,13 @@ test('renderClientContent outputs a scoped shell and client API fetcher', () => 
   assert.match(html, /setupMobileActiveCard/);
   assert.match(html, /IntersectionObserver/);
   assert.match(html, /calculateCardVisibleArea/);
+  assert.match(html, /calculateCardVisibleRatio/);
+  assert.match(html, /calculateCardActiveDistance/);
+  assert.match(html, /viewportActiveLine/);
   assert.match(html, /getBoundingClientRect\(\)/);
   assert.match(html, /window\.addEventListener\('scroll', scheduleMobileActiveCardUpdate/);
   assert.match(html, /window\.addEventListener\('resize', scheduleMobileActiveCardUpdate/);
+  assert.doesNotMatch(html, /activeArea/);
   assert.match(html, /data-bb-card-active/);
   assert.match(html, /matchMedia\('\(max-width: 640px\)'\)/);
   assert.match(html, /data-bb-media-index/);
@@ -93,8 +97,8 @@ test('renderClientContent outputs a scoped shell and client API fetcher', () => 
   assert.match(html, /data-bb-viewer-open="true"\] \.bb-channel-media-rail\{max-height:0;opacity:0/);
   assert.match(html, /data-bb-viewer-open="true"\] \.bb-channel-image-viewer\{margin-top:\.7rem/);
   assert.match(html, /@media\(max-width:640px\)/);
-  assert.match(html, /data-bb-card-active="true"\] \.bb-channel-card-surface\{transform:translate\(3px,-4px\)/);
-  assert.match(html, /data-bb-viewer-open="true"\] \.bb-channel-card-surface\{transform:none/);
+  assert.match(html, /data-bb-card-active="true"\]\{transform:translate\(4px,-5px\)/);
+  assert.match(html, /data-bb-viewer-open="true"\]\{transform:none/);
   assert.match(html, /justify-self:center/);
   assert.match(html, /bb-channel-feed::before/);
   assert.match(html, /bb-channel-tags span/);
