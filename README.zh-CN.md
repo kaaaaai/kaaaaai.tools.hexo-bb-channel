@@ -11,8 +11,6 @@
 
 `hexo-bb-channel` 是一个轻量 Hexo 插件：它只生成 `/bb/` 页面壳，内容在浏览器端从独立 API 拉取。这样博客仍然是静态站，但 Telegram Channel 更新后不需要重新 `hexo generate`。
 
-在线示例：[https://www.kaaaaai.cn/bb/](https://www.kaaaaai.cn/bb/)
-
 ## 效果预览
 
 在线示例：[https://www.kaaaaai.cn/bb/](https://www.kaaaaai.cn/bb/)
@@ -25,7 +23,7 @@
 - **静态博客里的动态内容**：页面访问时从 API 拉取 Telegram 内容。
 - **博客侧不放 Telegram 凭证**：Hexo 只需要配置一个 API 地址。
 - **适合碎片流展示**：支持正文、Telegram 原生 hashtag entity、图片、文件、分页、图片预览交互。
-- **保留评论能力**：生成的是标准 Hexo page，默认开启 `comments: true`。
+- **保留主题评论能力**：生成的是标准 Hexo page，并设置 `comments: true`；最终是否显示评论取决于主题和评论系统。
 
 ## 快速开始
 
@@ -39,6 +37,8 @@
 
 后端仓库：[Kaaaaai/kaaaaai.tools.channel-api](https://github.com/Kaaaaai/kaaaaai.tools.channel-api)
 详细的 Telegram 频道创建步骤见 API 仓库 README。
+
+生产环境请将 `ALLOWED_ORIGINS` 设置为博客的完整 Origin，例如 `https://www.example.com`，确保生成页面能够请求 API。
 
 ### 2. 安装 Hexo 插件
 
@@ -94,7 +94,7 @@ http://localhost:4000/bb/
 | `route` | `bb/` | 页面路由，例如 `moments/`。 |
 | `title` | `moments` | 页面内容区标题。 |
 | `description` | 空 | 页面描述。 |
-| `api_base` | 空 | `kaaaaai.tools.channel-api` 的 API 根地址。 |
+| `api_base` | 空 | client 模式必填。`kaaaaai.tools.channel-api` 的 API 根地址；未配置时页面会显示 `Missing bb_channel.api_base`。 |
 | `page_size` | `20` | 每页拉取数量。 |
 
 ## 工作原理
@@ -198,7 +198,6 @@ npm test
 ## 相关项目
 
 - API 后端：[Kaaaaai/kaaaaai.tools.channel-api](https://github.com/Kaaaaai/kaaaaai.tools.channel-api)
-- 在线示例：[https://www.kaaaaai.cn/bb/](https://www.kaaaaai.cn/bb/)
 
 ## License
 

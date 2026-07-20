@@ -11,8 +11,6 @@ English | [Chinese](./README.zh-CN.md)
 
 `hexo-bb-channel` is a small Hexo plugin that creates a `/bb/` page shell and loads posts from a separate API at runtime. Your blog stays static, while Telegram updates can appear without rebuilding the whole site.
 
-Live sample: [https://www.kaaaaai.cn/bb/](https://www.kaaaaai.cn/bb/)
-
 ## Preview
 
 Live demo: [https://www.kaaaaai.cn/bb/](https://www.kaaaaai.cn/bb/)
@@ -25,7 +23,7 @@ Live demo: [https://www.kaaaaai.cn/bb/](https://www.kaaaaai.cn/bb/)
 - **Dynamic content on static blogs**: Telegram posts are fetched in the browser from the API backend.
 - **No Telegram token in the blog**: the Hexo side only needs a public API URL.
 - **Media-friendly timeline**: supports text, real Telegram hashtag entities, images, files, pagination, and image preview interactions.
-- **Comments still work**: the generated page is a normal Hexo page and keeps `comments: true`.
+- **Theme comments remain available**: the generated page is a standard Hexo page with `comments: true`; whether comments render depends on your theme and comment system.
 
 ## Quick Start
 
@@ -39,6 +37,8 @@ Deploy the companion API first:
 
 Backend repo: [Kaaaaai/kaaaaai.tools.channel-api](https://github.com/Kaaaaai/kaaaaai.tools.channel-api)
 See the API README for detailed Telegram channel creation steps.
+
+For production, set `ALLOWED_ORIGINS` to your blog's exact origin, for example `https://www.example.com`, so the API accepts requests from the generated page.
 
 ### 2. Install the Hexo plugin
 
@@ -94,7 +94,7 @@ http://localhost:4000/bb/
 | `route` | `bb/` | Output route, for example `moments/`. |
 | `title` | `moments` | Page title inside the content area. |
 | `description` | empty | Subtitle under the title. |
-| `api_base` | empty | Base URL of `kaaaaai.tools.channel-api`. |
+| `api_base` | empty | Required in client mode. Base URL of `kaaaaai.tools.channel-api`; when omitted, the page shows `Missing bb_channel.api_base`. |
 | `page_size` | `20` | Posts requested per page. |
 
 ## How It Works
@@ -198,7 +198,6 @@ npm test
 ## Related
 
 - API backend: [Kaaaaai/kaaaaai.tools.channel-api](https://github.com/Kaaaaai/kaaaaai.tools.channel-api)
-- Live sample: [https://www.kaaaaai.cn/bb/](https://www.kaaaaai.cn/bb/)
 
 ## License
 
