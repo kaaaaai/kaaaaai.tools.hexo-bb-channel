@@ -27,6 +27,8 @@ function renderClientScript() {
           const pager = root.querySelector('[data-bb-channel-pagination]');
           const status = root.querySelector('[data-bb-channel-status]');
           let bbActiveCardObserver = null;
+          let bbActiveCardRaf = 0;
+          let bbActiveCardListening = false;
           const bbActiveCardQuery = window.matchMedia ? window.matchMedia('(max-width: 640px)') : null;
 
         const escapeHtml = (value = '') => String(value)
@@ -128,39 +130,73 @@ function renderClientScript() {
           });
         };
 
-        const setupMobileActiveCard = () => {
+        const calculateCardVisibleArea = (card) => {
+          const surface = card.querySelector('.bb-channel-card-surface') || card;
+          const rect = surface.getBoundingClientRect();
+          const viewportWidth = window.innerWidth || document.documentElement.clientWidth || 0;
+          const viewportHeight = window.innerHeight || document.documentElement.clientHeight || 0;
+          const width = Math.max(0, Math.min(rect.right, viewportWidth) - Math.max(rect.left, 0));
+          const height = Math.max(0, Math.min(rect.bottom, viewportHeight) - Math.max(rect.top, 0));
+          return width * height;
+        };
+
+        const activateLargestVisibleCard = () => {
+          bbActiveCardRaf = 0;
+          if (!bbActiveCardQuery || !bbActiveCardQuery.matches) {
+            clearMobileActiveCards();
+            return;
+          }
+          let activeCard = null;
+          let activeArea = 0;
+          feed.querySelectorAll('.bb-channel-card').forEach((card) => {
+            const area = card.dataset.bbViewerOpen === 'true' ? 0 : calculateCardVisibleArea(card);
+            if (area > activeArea) {
+              activeArea = area;
+              activeCard = card;
+            }
+          });
+          feed.querySelectorAll('.bb-channel-card').forEach((card) => {
+            if (card === activeCard && activeArea > 0) {
+              card.dataset.bbCardActive = 'true';
+            } else {
+              delete card.dataset.bbCardActive;
+            }
+          });
+        };
+
+        const scheduleMobileActiveCardUpdate = () => {
+          if (bbActiveCardRaf) return;
+          bbActiveCardRaf = window.requestAnimationFrame(activateLargestVisibleCard);
+        };
+
+        const stopMobileActiveCardTracking = () => {
           if (bbActiveCardObserver) {
             bbActiveCardObserver.disconnect();
             bbActiveCardObserver = null;
           }
+          if (bbActiveCardRaf) {
+            window.cancelAnimationFrame(bbActiveCardRaf);
+            bbActiveCardRaf = 0;
+          }
+          if (bbActiveCardListening) {
+            window.removeEventListener('scroll', scheduleMobileActiveCardUpdate);
+            window.removeEventListener('resize', scheduleMobileActiveCardUpdate);
+            bbActiveCardListening = false;
+          }
+        };
+
+        const setupMobileActiveCard = () => {
+          stopMobileActiveCardTracking();
           clearMobileActiveCards();
-          if (!bbActiveCardQuery || !bbActiveCardQuery.matches || !('IntersectionObserver' in window)) return;
-          const visibleAreas = new Map();
-          const activateLargestVisibleCard = () => {
-            let activeCard = null;
-            let activeArea = 0;
-            visibleAreas.forEach((area, card) => {
-              if (area > activeArea) {
-                activeArea = area;
-                activeCard = card;
-              }
-            });
-            feed.querySelectorAll('.bb-channel-card').forEach((card) => {
-              if (card === activeCard && activeArea > 0) {
-                card.dataset.bbCardActive = 'true';
-              } else {
-                delete card.dataset.bbCardActive;
-              }
-            });
-          };
-          bbActiveCardObserver = new IntersectionObserver((entries) => {
-            entries.forEach((entry) => {
-              const area = entry.isIntersecting ? entry.intersectionRect.width * entry.intersectionRect.height : 0;
-              visibleAreas.set(entry.target, area);
-            });
-            requestAnimationFrame(activateLargestVisibleCard);
-          }, { threshold: [0, .15, .3, .45, .6, .75, .9, 1] });
-          feed.querySelectorAll('.bb-channel-card').forEach((card) => bbActiveCardObserver.observe(card));
+          if (!bbActiveCardQuery || !bbActiveCardQuery.matches) return;
+          window.addEventListener('scroll', scheduleMobileActiveCardUpdate, { passive: true });
+          window.addEventListener('resize', scheduleMobileActiveCardUpdate);
+          bbActiveCardListening = true;
+          if ('IntersectionObserver' in window) {
+            bbActiveCardObserver = new IntersectionObserver(scheduleMobileActiveCardUpdate, { threshold: [0, .15, .3, .45, .6, .75, .9, 1] });
+            feed.querySelectorAll('.bb-channel-card').forEach((card) => bbActiveCardObserver.observe(card));
+          }
+          scheduleMobileActiveCardUpdate();
         };
 
         if (bbActiveCardQuery) {

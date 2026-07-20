@@ -70,6 +70,10 @@ test('renderClientContent outputs a scoped shell and client API fetcher', () => 
   assert.match(html, /behavior: useSmoothScroll \? 'smooth' : 'auto'/);
   assert.match(html, /setupMobileActiveCard/);
   assert.match(html, /IntersectionObserver/);
+  assert.match(html, /calculateCardVisibleArea/);
+  assert.match(html, /getBoundingClientRect\(\)/);
+  assert.match(html, /window\.addEventListener\('scroll', scheduleMobileActiveCardUpdate/);
+  assert.match(html, /window\.addEventListener\('resize', scheduleMobileActiveCardUpdate/);
   assert.match(html, /data-bb-card-active/);
   assert.match(html, /matchMedia\('\(max-width: 640px\)'\)/);
   assert.match(html, /data-bb-media-index/);
