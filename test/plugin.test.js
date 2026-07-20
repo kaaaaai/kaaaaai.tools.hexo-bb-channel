@@ -58,6 +58,13 @@ test('renderClientContent outputs a scoped shell and client API fetcher', () => 
   assert.match(html, /bbViewerClosing/);
   assert.match(html, /preserveCardViewportPosition/);
   assert.match(html, /focus\(\{ preventScroll: true \}\)/);
+  assert.match(html, /positionImageTrack/);
+  assert.match(html, /useSmoothScroll/);
+  assert.match(html, /behavior: useSmoothScroll \? 'smooth' : 'auto'/);
+  assert.match(html, /setupMobileActiveCard/);
+  assert.match(html, /IntersectionObserver/);
+  assert.match(html, /data-bb-card-active/);
+  assert.match(html, /matchMedia\('\(max-width: 640px\)'\)/);
   assert.match(html, /data-bb-media-index/);
   assert.match(html, /hydrateImages/);
   assert.match(html, /track\.scrollTo/);
@@ -75,6 +82,8 @@ test('renderClientContent outputs a scoped shell and client API fetcher', () => 
   assert.match(html, /data-bb-viewer-open="true"\] \.bb-channel-media-rail\{max-height:0;opacity:0/);
   assert.match(html, /data-bb-viewer-open="true"\] \.bb-channel-image-viewer\{margin-top:\.7rem/);
   assert.match(html, /@media\(max-width:640px\)/);
+  assert.match(html, /data-bb-card-active="true"\] \.bb-channel-card-surface\{transform:translate\(3px,-4px\)/);
+  assert.match(html, /data-bb-viewer-open="true"\] \.bb-channel-card-surface\{transform:none/);
   assert.match(html, /justify-self:center/);
   assert.match(html, /bb-channel-feed::before/);
   assert.match(html, /bb-channel-tags span/);

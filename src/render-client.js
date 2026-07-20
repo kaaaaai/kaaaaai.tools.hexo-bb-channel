@@ -26,6 +26,8 @@ function renderClientScript() {
           const feed = root.querySelector('[data-bb-channel-feed]');
           const pager = root.querySelector('[data-bb-channel-pagination]');
           const status = root.querySelector('[data-bb-channel-status]');
+          let bbActiveCardObserver = null;
+          const bbActiveCardQuery = window.matchMedia ? window.matchMedia('(max-width: 640px)') : null;
 
         const escapeHtml = (value = '') => String(value)
           .replace(/&/g, '&amp;')
@@ -114,6 +116,62 @@ function renderClientScript() {
           });
         };
 
+        const positionImageTrack = (track, index, useSmoothScroll) => {
+          const left = track.clientWidth * index;
+          track.scrollTo({ left, behavior: useSmoothScroll ? 'smooth' : 'auto' });
+          if (!useSmoothScroll) track.scrollLeft = left;
+        };
+
+        const clearMobileActiveCards = () => {
+          feed.querySelectorAll('.bb-channel-card[data-bb-card-active]').forEach((card) => {
+            delete card.dataset.bbCardActive;
+          });
+        };
+
+        const setupMobileActiveCard = () => {
+          if (bbActiveCardObserver) {
+            bbActiveCardObserver.disconnect();
+            bbActiveCardObserver = null;
+          }
+          clearMobileActiveCards();
+          if (!bbActiveCardQuery || !bbActiveCardQuery.matches || !('IntersectionObserver' in window)) return;
+          const visibleAreas = new Map();
+          const activateLargestVisibleCard = () => {
+            let activeCard = null;
+            let activeArea = 0;
+            visibleAreas.forEach((area, card) => {
+              if (area > activeArea) {
+                activeArea = area;
+                activeCard = card;
+              }
+            });
+            feed.querySelectorAll('.bb-channel-card').forEach((card) => {
+              if (card === activeCard && activeArea > 0) {
+                card.dataset.bbCardActive = 'true';
+              } else {
+                delete card.dataset.bbCardActive;
+              }
+            });
+          };
+          bbActiveCardObserver = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+              const area = entry.isIntersecting ? entry.intersectionRect.width * entry.intersectionRect.height : 0;
+              visibleAreas.set(entry.target, area);
+            });
+            requestAnimationFrame(activateLargestVisibleCard);
+          }, { threshold: [0, .15, .3, .45, .6, .75, .9, 1] });
+          feed.querySelectorAll('.bb-channel-card').forEach((card) => bbActiveCardObserver.observe(card));
+        };
+
+        if (bbActiveCardQuery) {
+          const handleActiveCardQueryChange = () => setupMobileActiveCard();
+          if (typeof bbActiveCardQuery.addEventListener === 'function') {
+            bbActiveCardQuery.addEventListener('change', handleActiveCardQueryChange);
+          } else if (typeof bbActiveCardQuery.addListener === 'function') {
+            bbActiveCardQuery.addListener(handleActiveCardQueryChange);
+          }
+        }
+
         const openImageViewer = (card, index) => {
           const viewer = card.querySelector('[data-bb-image-viewer]');
           const track = card.querySelector('[data-bb-image-track]');
@@ -121,6 +179,7 @@ function renderClientScript() {
           const count = card.querySelector('[data-bb-image-count]');
           if (!viewer || !track || !slides.length) return;
           const safeIndex = (Number(index) + slides.length) % slides.length;
+          const useSmoothScroll = card.dataset.bbViewerOpen === 'true';
           card.dataset.bbImageIndex = String(safeIndex);
           if (count) count.textContent = slides.length > 1 ? (safeIndex + 1) + ' / ' + slides.length : '';
           preserveCardViewportPosition(card, () => {
@@ -130,7 +189,7 @@ function renderClientScript() {
             hydrateImages(slides[safeIndex]);
             requestAnimationFrame(() => {
               card.dataset.bbViewerOpen = 'true';
-              track.scrollTo({ left: track.clientWidth * safeIndex, behavior: 'smooth' });
+              positionImageTrack(track, safeIndex, useSmoothScroll);
               focusWithoutScroll(track);
             });
           });
@@ -199,6 +258,7 @@ function renderClientScript() {
           const data = await response.json();
           feed.innerHTML = (data.posts || []).map(renderCard).join('');
           hydrateImages(feed);
+          setupMobileActiveCard();
           status.textContent = '';
           pager.innerHTML = '';
           if (data.pagination && data.pagination.total > 1) {
@@ -327,8 +387,8 @@ function renderClientContent(config) {
       .bb-channel-portable .bb-channel-pagination span{min-width:2.15rem;background:#333;color:#fff;border-color:#333}
       @media(max-width:720px){.bb-channel-portable .bb-channel-body-with-media{grid-template-columns:1fr}.bb-channel-portable .bb-channel-media-rail{justify-self:start;width:min(18rem,100%)}}
       @keyframes bb-channel-shimmer{0%{background-position:180% 0}100%{background-position:-80% 0}}
-      @media(max-width:640px){.bb-channel-portable .bb-channel-intro{margin-bottom:1.2rem}.bb-channel-portable .bb-channel-title{font-size:1.45rem}.bb-channel-portable .bb-channel-intro-text{font-size:.94rem}.bb-channel-portable .bb-channel-feed{gap:.9rem;padding-left:1.15rem}.bb-channel-portable .bb-channel-feed::before{left:.06rem}.bb-channel-portable .bb-channel-dot{left:-1.32rem;top:1.42rem}.bb-channel-portable .bb-channel-card-surface{padding:1.05rem .95rem;border-radius:12px}.bb-channel-portable .bb-channel-card-placeholder{border-radius:12px}.bb-channel-portable .bb-channel-card:hover .bb-channel-card-surface{transform:none}.bb-channel-portable .bb-channel-meta{margin-bottom:.85rem}.bb-channel-portable .bb-channel-content{font-size:.96rem;line-height:1.72}.bb-channel-portable .bb-channel-media-rail{width:100%;max-width:20rem;grid-template-columns:repeat(3,minmax(0,1fr));justify-self:center;margin-top:.15rem}.bb-channel-portable .bb-channel-media-thumb{min-height:4.1rem}.bb-channel-portable .bb-channel-image-viewer{margin-top:.95rem;max-width:100%}.bb-channel-portable .bb-channel-image-slide{min-height:10rem}.bb-channel-portable .bb-channel-image-large{max-width:100%!important;max-height:68vh!important}.bb-channel-portable .bb-channel-image-nav{width:2.55rem;height:2.55rem}.bb-channel-portable .bb-channel-image-prev{left:.45rem}.bb-channel-portable .bb-channel-image-next{right:.45rem}.bb-channel-portable .bb-channel-attachment{align-items:flex-start;padding:.78rem .82rem}.bb-channel-portable .bb-channel-attachment-title{white-space:normal;overflow-wrap:anywhere}.bb-channel-portable .bb-channel-tags{gap:.42rem}.bb-channel-portable .bb-channel-pagination{gap:1rem}}
-      @media(prefers-reduced-motion:reduce){.bb-channel-portable .bb-channel-card-placeholder,.bb-channel-portable .bb-channel-card-surface,.bb-channel-portable .bb-channel-media-rail,.bb-channel-portable .bb-channel-image-viewer,.bb-channel-portable .bb-channel-image-large,.bb-channel-portable .bb-channel-attachment{transition:none}.bb-channel-portable .bb-channel-card:hover .bb-channel-card-surface{transform:none}}
+      @media(max-width:640px){.bb-channel-portable .bb-channel-intro{margin-bottom:1.2rem}.bb-channel-portable .bb-channel-title{font-size:1.45rem}.bb-channel-portable .bb-channel-intro-text{font-size:.94rem}.bb-channel-portable .bb-channel-feed{gap:.9rem;padding-left:1.15rem}.bb-channel-portable .bb-channel-feed::before{left:.06rem}.bb-channel-portable .bb-channel-dot{left:-1.32rem;top:1.42rem}.bb-channel-portable .bb-channel-card-surface{padding:1.05rem .95rem;border-radius:12px}.bb-channel-portable .bb-channel-card-placeholder{border-radius:12px}.bb-channel-portable .bb-channel-card:hover .bb-channel-card-surface{transform:none}.bb-channel-portable .bb-channel-card[data-bb-card-active="true"] .bb-channel-card-surface{transform:translate(3px,-4px);border-style:solid;border-color:#e7b99d;background:rgba(255,255,255,.86);box-shadow:0 12px 26px -24px rgba(15,23,42,.32)}.bb-channel-portable .bb-channel-card[data-bb-viewer-open="true"] .bb-channel-card-surface{transform:none}.bb-channel-portable .bb-channel-meta{margin-bottom:.85rem}.bb-channel-portable .bb-channel-content{font-size:.96rem;line-height:1.72}.bb-channel-portable .bb-channel-media-rail{width:100%;max-width:20rem;grid-template-columns:repeat(3,minmax(0,1fr));justify-self:center;margin-top:.15rem}.bb-channel-portable .bb-channel-media-thumb{min-height:4.1rem}.bb-channel-portable .bb-channel-image-viewer{margin-top:.95rem;max-width:100%}.bb-channel-portable .bb-channel-image-slide{min-height:10rem}.bb-channel-portable .bb-channel-image-large{max-width:100%!important;max-height:68vh!important}.bb-channel-portable .bb-channel-image-nav{width:2.55rem;height:2.55rem}.bb-channel-portable .bb-channel-image-prev{left:.45rem}.bb-channel-portable .bb-channel-image-next{right:.45rem}.bb-channel-portable .bb-channel-attachment{align-items:flex-start;padding:.78rem .82rem}.bb-channel-portable .bb-channel-attachment-title{white-space:normal;overflow-wrap:anywhere}.bb-channel-portable .bb-channel-tags{gap:.42rem}.bb-channel-portable .bb-channel-pagination{gap:1rem}}
+      @media(prefers-reduced-motion:reduce){.bb-channel-portable .bb-channel-card-placeholder,.bb-channel-portable .bb-channel-card-surface,.bb-channel-portable .bb-channel-media-rail,.bb-channel-portable .bb-channel-image-viewer,.bb-channel-portable .bb-channel-image-large,.bb-channel-portable .bb-channel-attachment{transition:none}.bb-channel-portable .bb-channel-card:hover .bb-channel-card-surface,.bb-channel-portable .bb-channel-card[data-bb-card-active="true"] .bb-channel-card-surface{transform:none}}
     </style>
     <div class="bb-channel-portable" data-bb-channel-root data-api-base="${escapeHtml(config.apiBase)}" data-page-size="${escapeHtml(config.pageSize)}">
       <header class="bb-channel-intro">
