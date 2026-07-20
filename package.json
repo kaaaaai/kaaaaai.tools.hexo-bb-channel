@@ -29,11 +29,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Kaaaaai/kaaaaai.tools.hexo-bb-channel.git"
+    "url": "git+https://github.com/kaaaaai/kaaaaai.tools.hexo-bb-channel.git"
   },
-  "homepage": "https://github.com/Kaaaaai/kaaaaai.tools.hexo-bb-channel#readme",
+  "homepage": "https://github.com/kaaaaai/kaaaaai.tools.hexo-bb-channel#readme",
   "bugs": {
-    "url": "https://github.com/Kaaaaai/kaaaaai.tools.hexo-bb-channel/issues"
+    "url": "https://github.com/kaaaaai/kaaaaai.tools.hexo-bb-channel/issues"
   },
   "author": "Kaaaaai",
   "license": "MIT",

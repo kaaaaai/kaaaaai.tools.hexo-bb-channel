@@ -25,6 +25,11 @@ jobs:
       - name: Use Trusted Publishing-compatible npm
         run: npm install --global npm@11.18.0
 
+      - name: Show release toolchain
+        run: |
+          node --version
+          npm --version
+
       - name: Verify tag matches package version
         env:
           RELEASE_TAG: ${{ github.ref_name }}
@@ -41,4 +46,4 @@ jobs:
       - name: Publish package
         run: |
           unset NODE_AUTH_TOKEN
-          npm publish --registry=https://registry.npmjs.org
+          npm publish --provenance --registry=https://registry.npmjs.org
