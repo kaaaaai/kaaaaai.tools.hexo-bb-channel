@@ -1,16 +1,18 @@
 {
   "name": "hexo-bb-channel",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Render Telegram channel microblog timelines in Hexo using a dynamic API backend.",
   "main": "index.js",
   "files": [
     "index.js",
     "src",
     "README.md",
+    "README.zh-CN.md",
     "LICENSE"
   ],
   "scripts": {
-    "test": "node --test test/*.test.js"
+    "test": "node --test test/*.test.js",
+    "prepublishOnly": "npm test"
   },
   "keywords": [
     "hexo",
@@ -23,5 +25,18 @@
   },
   "dependencies": {
     "lucide-static": "^1.24.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Kaaaaai/kaaaaai.tools.hexo-bb-channel.git"
+  },
+  "homepage": "https://github.com/Kaaaaai/kaaaaai.tools.hexo-bb-channel#readme",
+  "bugs": {
+    "url": "https://github.com/Kaaaaai/kaaaaai.tools.hexo-bb-channel/issues"
+  },
+  "author": "Kaaaaai",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
   }
 }

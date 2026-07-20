@@ -17,7 +17,7 @@ Live sample: [https://www.kaaaaai.cn/bb/](https://www.kaaaaai.cn/bb/)
 
 Live demo: [https://www.kaaaaai.cn/bb/](https://www.kaaaaai.cn/bb/)
 
-![Hexo BB Channel desktop preview](./docs/assets/preview-desktop.png)
+![Hexo BB Channel desktop preview](https://raw.githubusercontent.com/Kaaaaai/kaaaaai.tools.hexo-bb-channel/main/docs/assets/preview-desktop.png)
 
 ## Why This Design
 
@@ -42,15 +42,19 @@ See the API README for detailed Telegram channel creation steps.
 
 ### 2. Install the Hexo plugin
 
+Install the latest stable release from npm:
+
 ```bash
 npm install hexo-bb-channel
 ```
 
-If the npm package is not published yet, install from GitHub:
+To try unreleased changes from the default GitHub branch instead:
 
 ```bash
 npm install github:Kaaaaai/kaaaaai.tools.hexo-bb-channel
 ```
+
+Installing the Hexo plugin does not deploy the companion API. Complete step 1 and keep the `bb_channel` block in your site's root `_config.yml`.
 
 ### 3. Configure Hexo
 

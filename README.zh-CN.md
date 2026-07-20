@@ -17,7 +17,7 @@
 
 在线示例：[https://www.kaaaaai.cn/bb/](https://www.kaaaaai.cn/bb/)
 
-![Hexo BB Channel 桌面端预览](./docs/assets/preview-desktop.png)
+![Hexo BB Channel 桌面端预览](https://raw.githubusercontent.com/Kaaaaai/kaaaaai.tools.hexo-bb-channel/main/docs/assets/preview-desktop.png)
 
 ## 为什么这样设计
 
@@ -42,15 +42,19 @@
 
 ### 2. 安装 Hexo 插件
 
+从 npm 安装最新稳定版：
+
 ```bash
 npm install hexo-bb-channel
 ```
 
-如果 npm 包暂未发布，可以直接从 GitHub 安装：
+如需试用 GitHub 默认分支上尚未发布的改动，可改为：
 
 ```bash
 npm install github:Kaaaaai/kaaaaai.tools.hexo-bb-channel
 ```
+
+安装 Hexo 插件不会自动部署配套 API。请先完成第 1 步，并保留站点根目录 `_config.yml` 中的 `bb_channel` 配置。
 
 ### 3. 配置 Hexo
 
