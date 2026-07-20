@@ -59,6 +59,14 @@ test('renderClientContent outputs a scoped shell and client API fetcher', () => 
   assert.match(html, /letter-spacing:0/);
   assert.match(html, /letter-spacing:\.01em/);
   assert.match(html, /text-rendering:optimizeLegibility/);
+  assert.match(html, /--bb-card-transition:360ms cubic-bezier\(\.37,0,\.63,1\)/);
+  assert.match(html, /--bb-card-offset-x:6px/);
+  assert.match(html, /--bb-card-offset-y:-6px/);
+  assert.match(html, /--bb-card-mobile-offset-x:4px/);
+  assert.match(html, /--bb-card-mobile-offset-y:-5px/);
+  assert.match(html, /bb-channel-card:hover \.bb-channel-card-placeholder,\.bb-channel-portable \.bb-channel-card\[data-bb-card-active="true"\] \.bb-channel-card-placeholder\{opacity:1\}/);
+  assert.match(html, /bb-channel-card:hover \.bb-channel-card-surface,\.bb-channel-portable \.bb-channel-card\[data-bb-card-active="true"\] \.bb-channel-card-surface\{transform:translate\(var\(--bb-card-offset-x\),var\(--bb-card-offset-y\)\)/);
+  assert.match(html, /@media\(max-width:640px\).*--bb-card-offset-x:var\(--bb-card-mobile-offset-x\).*--bb-card-offset-y:var\(--bb-card-mobile-offset-y\)/);
   assert.match(html, /closest\('\.bb-channel-image-large'\)/);
   assert.match(html, /data-bb-viewer-open/);
   assert.match(html, /data-bb-viewer-closing/);
@@ -86,7 +94,7 @@ test('renderClientContent outputs a scoped shell and client API fetcher', () => 
   assert.doesNotMatch(html, /scrollIntoView/);
   assert.match(html, /scroll-snap-type:x mandatory/);
   assert.match(html, /object-fit:contain/);
-  assert.match(html, /border:1px dashed #d9d9d9/);
+  assert.match(html, /border:1px dashed var\(--bb-card-placeholder-border\)/);
   assert.match(html, /aspect-ratio:16\/10/);
   assert.match(html, /cursor:zoom-out/);
   assert.match(html, /max-height:0/);
@@ -98,7 +106,8 @@ test('renderClientContent outputs a scoped shell and client API fetcher', () => 
   assert.match(html, /data-bb-viewer-open="true"\] \.bb-channel-image-viewer\{margin-top:\.7rem/);
   assert.match(html, /@media\(max-width:640px\)/);
   assert.match(html, /data-bb-card-active="true"\] \.bb-channel-card-placeholder\{opacity:1/);
-  assert.match(html, /data-bb-card-active="true"\] \.bb-channel-card-surface\{transform:translate\(4px,-5px\)/);
+  assert.match(html, /data-bb-card-active="true"\] \.bb-channel-card-surface\{transform:translate\(var\(--bb-card-offset-x\),var\(--bb-card-offset-y\)\)/);
+  assert.doesNotMatch(html, /bb-channel-card:hover \.bb-channel-card-surface\{transform:none\}/);
   assert.match(html, /data-bb-viewer-open="true"\] \.bb-channel-card-surface\{transform:none/);
   assert.match(html, /justify-self:center/);
   assert.match(html, /bb-channel-feed::before/);
