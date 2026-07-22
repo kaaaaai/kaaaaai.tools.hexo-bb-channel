@@ -163,6 +163,18 @@ test('uses immediate scrolling when reduced motion is requested', async () => {
   assert.equal(card.scrollOptions.behavior, 'auto');
 });
 
+test('defers initial focus until the document finishes loading', async () => {
+  const harness = createHarness('/bb/?page=1#bb-7');
+  harness.browser.document.readyState = 'loading';
+  const card = harness.addCard('bb-7');
+
+  await createDeepLinkController(harness.browser, harness.options).start();
+
+  assert.equal(card.focusOptions, null);
+  harness.listeners.get('load')();
+  assert.deepEqual(card.focusOptions, { preventScroll: true });
+});
+
 test('pushes pagination history without an old hash', async () => {
   const harness = createHarness('/bb/?filter=notes&page=2#bb-42');
   const controller = createDeepLinkController(harness.browser, harness.options);

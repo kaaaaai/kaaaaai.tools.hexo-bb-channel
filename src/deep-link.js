@@ -22,6 +22,7 @@ function createDeepLinkController(browser, options) {
   let activeCardTabindex = null;
   let highlightTimer = 0;
   let navigationId = 0;
+  let pendingFocus = null;
   let started = false;
 
   const motionBehavior = () => {
@@ -30,6 +31,10 @@ function createDeepLinkController(browser, options) {
   };
 
   const clearHighlight = () => {
+    if (pendingFocus) {
+      browser.removeEventListener('load', pendingFocus);
+      pendingFocus = null;
+    }
     if (highlightTimer) {
       browser.clearTimeout(highlightTimer);
       highlightTimer = 0;
@@ -57,10 +62,20 @@ function createDeepLinkController(browser, options) {
     card.setAttribute('data-bb-deep-link-active', 'true');
     card.setAttribute('tabindex', '-1');
     card.scrollIntoView({ behavior: motionBehavior(), block: 'center' });
-    try {
-      card.focus({ preventScroll: true });
-    } catch {
-      card.focus();
+    const focusTarget = () => {
+      pendingFocus = null;
+      if (activeCard !== card) return;
+      try {
+        card.focus({ preventScroll: true });
+      } catch {
+        card.focus();
+      }
+    };
+    if (browser.document.readyState === 'loading') {
+      pendingFocus = focusTarget;
+      browser.addEventListener('load', focusTarget, { once: true });
+    } else {
+      focusTarget();
     }
     highlightTimer = browser.setTimeout(clearHighlight, options.highlightDuration || 2400);
     return true;
