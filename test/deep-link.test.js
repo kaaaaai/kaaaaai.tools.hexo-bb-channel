@@ -42,8 +42,10 @@ function createHarness(path = '/bb/') {
   const feed = createElement();
   const root = createElement();
   const listeners = new Map();
+  const animationFrames = new Map();
   const timers = new Map();
   const loadedPages = [];
+  let nextFrame = 1;
   let nextTimer = 1;
   let reducedMotion = false;
   let currentUrl = new URL(path, 'https://blog.example.com');
@@ -67,17 +69,28 @@ function createHarness(path = '/bb/') {
       },
     },
     location,
+    cancelAnimationFrame(id) {
+      animationFrames.delete(id);
+    },
     addEventListener(type, listener) {
       listeners.set(type, listener);
     },
     clearTimeout(id) {
       timers.delete(id);
     },
+    getComputedStyle(element) {
+      return { visibility: element.visibility || 'visible' };
+    },
     matchMedia() {
       return { matches: reducedMotion };
     },
     removeEventListener(type) {
       listeners.delete(type);
+    },
+    requestAnimationFrame(callback) {
+      const id = nextFrame++;
+      animationFrames.set(id, callback);
+      return id;
     },
     setTimeout(callback) {
       const id = nextTimer++;
@@ -112,6 +125,11 @@ function createHarness(path = '/bb/') {
     runTimers() {
       [...timers.values()].forEach(callback => callback());
       timers.clear();
+    },
+    runAnimationFrames() {
+      const callbacks = [...animationFrames.values()];
+      animationFrames.clear();
+      callbacks.forEach(callback => callback());
     },
     setLocation(nextPath) {
       currentUrl = new URL(nextPath, currentUrl);
@@ -172,6 +190,19 @@ test('defers initial focus until the document finishes loading', async () => {
 
   assert.equal(card.focusOptions, null);
   harness.listeners.get('load')();
+  assert.deepEqual(card.focusOptions, { preventScroll: true });
+});
+
+test('waits for a NexT motion-hidden card to become visible before focusing', async () => {
+  const harness = createHarness('/bb/?page=1#bb-7');
+  const card = harness.addCard('bb-7');
+  card.visibility = 'hidden';
+
+  await createDeepLinkController(harness.browser, harness.options).start();
+
+  assert.equal(card.focusOptions, null);
+  card.visibility = 'visible';
+  harness.runAnimationFrames();
   assert.deepEqual(card.focusOptions, { preventScroll: true });
 });
 
