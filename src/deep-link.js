@@ -21,7 +21,7 @@ function createDeepLinkController(browser, options) {
   let activeCardHadTabindex = false;
   let activeCardTabindex = null;
   let focusAttempts = 0;
-  let focusFrame = 0;
+  let focusRetryTimer = 0;
   let highlightTimer = 0;
   let navigationId = 0;
   let pendingFocus = null;
@@ -37,9 +37,9 @@ function createDeepLinkController(browser, options) {
       browser.removeEventListener('load', pendingFocus);
       pendingFocus = null;
     }
-    if (focusFrame && browser.cancelAnimationFrame) {
-      browser.cancelAnimationFrame(focusFrame);
-      focusFrame = 0;
+    if (focusRetryTimer) {
+      browser.clearTimeout(focusRetryTimer);
+      focusRetryTimer = 0;
     }
     if (highlightTimer) {
       browser.clearTimeout(highlightTimer);
@@ -71,12 +71,12 @@ function createDeepLinkController(browser, options) {
     focusAttempts = 0;
     const focusTarget = () => {
       pendingFocus = null;
-      focusFrame = 0;
+      focusRetryTimer = 0;
       if (activeCard !== card) return;
       const style = browser.getComputedStyle && browser.getComputedStyle(card);
-      if (style && style.visibility === 'hidden' && focusAttempts < 120 && browser.requestAnimationFrame) {
+      if (style && style.visibility === 'hidden' && focusAttempts < 40) {
         focusAttempts += 1;
-        focusFrame = browser.requestAnimationFrame(focusTarget);
+        focusRetryTimer = browser.setTimeout(focusTarget, 50);
         return;
       }
       try {

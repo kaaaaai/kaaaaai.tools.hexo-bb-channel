@@ -202,7 +202,7 @@ test('waits for a NexT motion-hidden card to become visible before focusing', as
 
   assert.equal(card.focusOptions, null);
   card.visibility = 'visible';
-  harness.runAnimationFrames();
+  harness.runTimers();
   assert.deepEqual(card.focusOptions, { preventScroll: true });
 });
 
