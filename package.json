@@ -1,6 +1,6 @@
 {
   "name": "hexo-bb-channel",
-  "version": "0.1.4",
+  "version": "0.2.0",
   "description": "Render Telegram channel microblog timelines in Hexo using a dynamic API backend.",
   "main": "index.js",
   "files": [

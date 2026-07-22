@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.2.0 - 2026-07-22
+
 ### Added
 
 - Added shareable `?page=N#bb-ID` deep links with post-render scrolling, temporary selected-card highlighting, and browser history restoration.
