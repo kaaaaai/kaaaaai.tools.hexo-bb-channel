@@ -23,7 +23,13 @@ function renderClientScript() {
         const createDeepLinkController = ${createDeepLinkController.toString()};
         window.initBbChannel = window.initBbChannel || (() => {
           const root = document.querySelector('[data-bb-channel-root]');
-          if (!root || root.dataset.bbChannelReady === 'true') return;
+          const previousRuntime = window.__bbChannelRuntime;
+          if (!root) {
+            if (previousRuntime) previousRuntime.destroy();
+            return;
+          }
+          if (previousRuntime && previousRuntime.root !== root) previousRuntime.destroy();
+          if (root.dataset.bbChannelReady === 'true') return;
           root.dataset.bbChannelReady = 'true';
           const apiBase = root.dataset.apiBase;
           const pageSize = root.dataset.pageSize || '20';
@@ -33,6 +39,7 @@ function renderClientScript() {
           let bbActiveCardObserver = null;
           let bbActiveCardRaf = 0;
           let bbActiveCardListening = false;
+          let bbActiveCardQueryChangeHandler = null;
           const bbActiveCardQuery = window.matchMedia ? window.matchMedia('(max-width: 640px)') : null;
 
         const escapeHtml = (value = '') => String(value)
@@ -229,11 +236,11 @@ function renderClientScript() {
         };
 
         if (bbActiveCardQuery) {
-          const handleActiveCardQueryChange = () => setupMobileActiveCard();
+          bbActiveCardQueryChangeHandler = () => setupMobileActiveCard();
           if (typeof bbActiveCardQuery.addEventListener === 'function') {
-            bbActiveCardQuery.addEventListener('change', handleActiveCardQueryChange);
+            bbActiveCardQuery.addEventListener('change', bbActiveCardQueryChangeHandler);
           } else if (typeof bbActiveCardQuery.addListener === 'function') {
-            bbActiveCardQuery.addListener(handleActiveCardQueryChange);
+            bbActiveCardQuery.addListener(bbActiveCardQueryChangeHandler);
           }
         }
 
@@ -327,7 +334,13 @@ function renderClientScript() {
           }
           if (!isCurrent()) return false;
           if (!response.ok) throw new Error('API responded ' + response.status);
-          const data = await response.json();
+          let data;
+          try {
+            data = await response.json();
+          } catch (error) {
+            if (!isCurrent()) return false;
+            throw error;
+          }
           if (!isCurrent()) return false;
           feed.innerHTML = (data.posts || []).map(renderCard).join('');
           hydrateImages(feed);
@@ -349,6 +362,23 @@ function renderClientScript() {
           highlightDuration: 2400,
           onError: (error) => { status.textContent = error.message; },
         });
+        window.__bbChannelRuntime = {
+          root,
+          destroy: () => {
+            deepLinkController.destroy();
+            stopMobileActiveCardTracking();
+            if (bbActiveCardQuery && bbActiveCardQueryChangeHandler) {
+              if (typeof bbActiveCardQuery.removeEventListener === 'function') {
+                bbActiveCardQuery.removeEventListener('change', bbActiveCardQueryChangeHandler);
+              } else if (typeof bbActiveCardQuery.removeListener === 'function') {
+                bbActiveCardQuery.removeListener(bbActiveCardQueryChangeHandler);
+              }
+            }
+            if (window.__bbChannelRuntime && window.__bbChannelRuntime.root === root) {
+              delete window.__bbChannelRuntime;
+            }
+          },
+        };
 
         pager.addEventListener('click', (event) => {
           const button = event.target.closest('button[data-page]');

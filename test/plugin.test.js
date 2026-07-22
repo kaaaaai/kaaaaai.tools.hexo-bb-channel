@@ -49,9 +49,14 @@ test('renderClientContent outputs a scoped shell and client API fetcher', () => 
   assert.match(html, /data-bb-deep-link-active/);
   assert.match(html, /deepLinkController\.goToPage/);
   assert.match(html, /deepLinkController\.start/);
+  assert.match(html, /window\.__bbChannelRuntime/);
+  assert.match(html, /previousRuntime\.destroy\(\)/);
+  assert.match(html, /deepLinkController\.destroy\(\)/);
+  assert.match(html, /removeEventListener\('change', bbActiveCardQueryChangeHandler\)/);
   assert.match(html, /popstate/);
   assert.match(html, /hashchange/);
   assert.match(html, /isCurrent\(\)/);
+  assert.match(html, /catch \(error\) \{\s*if \(!isCurrent\(\)\) return false;\s*throw error;\s*\}/);
   assert.doesNotMatch(html, /loadPage\(\)\.catch/);
   assert.match(html, /bb-channel-attachments/);
   assert.match(html, /bb-channel-attachment-title/);

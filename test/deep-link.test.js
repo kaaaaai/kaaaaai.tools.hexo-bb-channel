@@ -189,6 +189,8 @@ test('defers initial focus until the document finishes loading', async () => {
   await createDeepLinkController(harness.browser, harness.options).start();
 
   assert.equal(card.focusOptions, null);
+  harness.runTimers();
+  assert.equal(typeof harness.listeners.get('load'), 'function');
   harness.listeners.get('load')();
   assert.deepEqual(card.focusOptions, { preventScroll: true });
 });
@@ -243,6 +245,18 @@ test('registers history listeners and restores the latest navigation only', asyn
 
   assert.equal(secondCard.attributes.get('data-bb-deep-link-active'), 'true');
   assert.equal(firstCard.attributes.has('data-bb-deep-link-active'), false);
+});
+
+test('coalesces popstate and hashchange for the same history location', async () => {
+  const harness = createHarness('/bb/?page=1');
+  const controller = createDeepLinkController(harness.browser, harness.options);
+  await controller.start();
+
+  harness.setLocation('/bb/?page=2#bb-42');
+  await harness.listeners.get('popstate')();
+  await harness.listeners.get('hashchange')();
+
+  assert.deepEqual(harness.loadedPages.map(item => item.page), [1, 2]);
 });
 
 test('missing targets stay silent and destroy removes listeners', async () => {

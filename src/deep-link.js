@@ -23,6 +23,7 @@ function createDeepLinkController(browser, options) {
   let focusAttempts = 0;
   let focusRetryTimer = 0;
   let highlightTimer = 0;
+  let lastLocationKey = '';
   let navigationId = 0;
   let pendingFocus = null;
   let started = false;
@@ -84,6 +85,7 @@ function createDeepLinkController(browser, options) {
       } catch {
         card.focus();
       }
+      highlightTimer = browser.setTimeout(clearHighlight, options.highlightDuration || 2400);
     };
     if (browser.document.readyState === 'loading') {
       pendingFocus = focusTarget;
@@ -91,7 +93,6 @@ function createDeepLinkController(browser, options) {
     } else {
       focusTarget();
     }
-    highlightTimer = browser.setTimeout(clearHighlight, options.highlightDuration || 2400);
     return true;
   };
 
@@ -108,9 +109,17 @@ function createDeepLinkController(browser, options) {
     return true;
   };
 
-  const restore = () => renderLocation();
+  const restore = ({ force = false, scrollRoot = false } = {}) => {
+    const locationKey = browser.location.href;
+    if (!force && locationKey === lastLocationKey) return Promise.resolve(false);
+    lastLocationKey = locationKey;
+    return renderLocation({ scrollRoot }).catch(error => {
+      if (lastLocationKey === locationKey) lastLocationKey = '';
+      throw error;
+    });
+  };
   const handleLocationChange = () => {
-    restore().catch(error => {
+    return restore().catch(error => {
       if (typeof options.onError === 'function') options.onError(error);
     });
   };
@@ -121,7 +130,7 @@ function createDeepLinkController(browser, options) {
       browser.addEventListener('hashchange', handleLocationChange);
       started = true;
     }
-    return restore();
+    return restore({ force: true });
   };
 
   const goToPage = (page) => {
@@ -129,11 +138,12 @@ function createDeepLinkController(browser, options) {
     url.searchParams.set('page', String(normalizePage(page)));
     url.hash = '';
     browser.history.pushState({}, '', url.pathname + url.search);
-    return renderLocation({ scrollRoot: true });
+    return restore({ scrollRoot: true });
   };
 
   const destroy = () => {
     navigationId += 1;
+    lastLocationKey = '';
     clearHighlight();
     if (!started) return;
     browser.removeEventListener('popstate', handleLocationChange);
