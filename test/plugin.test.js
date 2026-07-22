@@ -106,6 +106,8 @@ test('renderClientContent outputs a scoped shell and client API fetcher', () => 
   assert.match(html, /window\.addEventListener\('resize', scheduleMobileActiveCardUpdate/);
   assert.doesNotMatch(html, /activeArea/);
   assert.match(html, /data-bb-card-active/);
+  assert.match(html, /\.bb-channel-portable \.bb-channel-card:focus\{outline:none\}/);
+  assert.match(html, /\.bb-channel-portable \.bb-channel-media-thumb:focus-visible/);
   assert.match(html, /matchMedia\('\(max-width: 640px\)'\)/);
   assert.match(html, /data-bb-media-index/);
   assert.match(html, /hydrateImages/);

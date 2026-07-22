@@ -449,6 +449,7 @@ function renderClientContent(config) {
       .bb-channel-portable .bb-channel-feed{position:relative;display:flex;flex-direction:column;gap:1.05rem;padding-left:2.1rem}
       .bb-channel-portable .bb-channel-feed::before{content:"";position:absolute;left:.22rem;top:.25rem;bottom:.25rem;width:1px;background:linear-gradient(to bottom,rgba(226,226,226,0),#e2e2e2 1.2rem,#e2e2e2 calc(100% - 1.2rem),rgba(226,226,226,0))}
       .bb-channel-portable .bb-channel-card{position:relative;border-radius:14px}
+      .bb-channel-portable .bb-channel-card:focus{outline:none}
       .bb-channel-portable .bb-channel-card-placeholder{pointer-events:none;position:absolute;inset:0;border:1px dashed var(--bb-card-placeholder-border);border-radius:14px;background:var(--bb-card-placeholder-bg);opacity:0;transition:opacity var(--bb-card-transition)}
       .bb-channel-portable .bb-channel-card-surface{position:relative;z-index:1;border:1px dashed var(--bb-card-placeholder-border);border-radius:14px;background:var(--bb-card-surface-bg);padding:1.45rem 1.65rem;box-shadow:none;transition:border-color var(--bb-card-transition),background-color var(--bb-card-transition),box-shadow var(--bb-card-transition),transform var(--bb-card-transition)}
       .bb-channel-portable .bb-channel-card[data-bb-card-active="true"] .bb-channel-card-placeholder,.bb-channel-portable .bb-channel-card[data-bb-deep-link-active="true"] .bb-channel-card-placeholder{opacity:1}
