@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 0.2.1 - 2026-07-22
+
+### Fixed
+
+- Suppressed Chromium's default blue outline on programmatically focused deep-link cards while preserving focus styles for interactive controls.
+
 ## 0.2.0 - 2026-07-22
 
 ### Added
