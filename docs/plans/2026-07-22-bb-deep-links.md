@@ -29,7 +29,7 @@
 - Produces: `normalizePage(value): number`.
 - Produces: `readDeepLink(location): { page: number, targetId: string }`.
 - Produces: `createDeepLinkController(browser, options)` with `start()`, `goToPage(page)`, `restore()`, and `destroy()`.
-- Consumes: `options.loadPage(page): Promise<void>`, `options.root`, `options.feed`, and `options.highlightDuration`.
+- Consumes: `options.loadPage(page, isCurrent): Promise<boolean>`, `options.root`, `options.feed`, and `options.highlightDuration`. The renderer calls `isCurrent()` immediately before mutating the feed and returns `false` for a stale response.
 
 - [ ] **Step 1: Write failing parsing tests**
 
@@ -111,7 +111,7 @@ Expected: parsing passes; behavior tests FAIL because the controller is not expo
 
 - [ ] **Step 6: Implement the minimal controller**
 
-Use a monotonically increasing `navigationId`. Each `renderLocation()` reads the URL, awaits `options.loadPage(page)`, and aborts post-render work if its ID is stale. `revealTarget()` uses `browser.document.getElementById(targetId)` plus `feed.contains(card)` for exact, selector-safe lookup; it applies `data-bb-deep-link-active`, temporarily adds `tabindex="-1"`, scrolls, focuses with `preventScroll`, and cleans up after `highlightDuration || 2400`.
+Use a monotonically increasing `navigationId`. Each `renderLocation()` reads the URL and calls `options.loadPage(page, () => currentId === navigationId)`. It aborts post-render work when the loader returns `false` or its ID is stale. `revealTarget()` uses `browser.document.getElementById(targetId)` plus `feed.contains(card)` for exact, selector-safe lookup; it applies `data-bb-deep-link-active`, temporarily adds `tabindex="-1"`, scrolls, focuses with `preventScroll`, and cleans up after `highlightDuration || 2400`.
 
 `goToPage()` preserves unrelated query parameters, sets `page`, clears the hash, calls `history.pushState`, and renders with the timeline root scroll enabled. `start()` registers `popstate` and `hashchange`; `destroy()` removes them and clears the highlight timer.
 
@@ -164,12 +164,12 @@ const createDeepLinkController = ${createDeepLinkController.toString()};
 const deepLinkController = createDeepLinkController(window, {
   root,
   feed,
-  loadPage,
+  loadPage: (page, isCurrent) => loadPage(page, isCurrent),
   highlightDuration: 2400,
 });
 ```
 
-Route pager clicks to `goToPage`, replace the unconditional initial `loadPage()` with `start()`, and retain existing status error reporting.
+Change `loadPage(page, isCurrent = () => true)` so it checks `isCurrent()` after parsing the response and before writing `feed`, `pager`, or status success state; stale responses return `false`. Route pager clicks to `goToPage`, replace the unconditional initial `loadPage()` with `start()`, and retain existing status error reporting.
 
 Add `data-bb-deep-link-active="true"` beside both `data-bb-card-active="true"` selectors for placeholder and surface styles. Add it to the reduced-motion transform rule too, so the exact visual treatment is shared.
 
