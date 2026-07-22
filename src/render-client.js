@@ -1,4 +1,5 @@
 const { fileIcon } = require('./icons');
+const { createDeepLinkController, normalizePage, readDeepLink } = require('./deep-link');
 
 function escapeHtml(value = '') {
   return String(value)
@@ -17,6 +18,9 @@ function renderClientScript() {
     <script data-pjax>
       (() => {
         const bbChannelFileIcon = ${JSON.stringify(fileIcon)};
+        const normalizePage = ${normalizePage.toString()};
+        const readDeepLink = ${readDeepLink.toString()};
+        const createDeepLinkController = ${createDeepLinkController.toString()};
         window.initBbChannel = window.initBbChannel || (() => {
           const root = document.querySelector('[data-bb-channel-root]');
           if (!root || root.dataset.bbChannelReady === 'true') return;
@@ -305,18 +309,26 @@ function renderClientScript() {
           });
         };
 
-        const loadPage = async (page = 1) => {
+        const loadPage = async (page = 1, isCurrent = () => true) => {
           if (!apiBase) {
-            status.textContent = 'Missing bb_channel.api_base';
-            return;
+            if (isCurrent()) status.textContent = 'Missing bb_channel.api_base';
+            return false;
           }
-          status.textContent = 'Loading...';
+          if (isCurrent()) status.textContent = 'Loading...';
           const url = new URL('/api/posts', apiBase);
           url.searchParams.set('page', page);
           url.searchParams.set('page_size', pageSize);
-          const response = await fetch(url.toString());
+          let response;
+          try {
+            response = await fetch(url.toString());
+          } catch (error) {
+            if (!isCurrent()) return false;
+            throw error;
+          }
+          if (!isCurrent()) return false;
           if (!response.ok) throw new Error('API responded ' + response.status);
           const data = await response.json();
+          if (!isCurrent()) return false;
           feed.innerHTML = (data.posts || []).map(renderCard).join('');
           hydrateImages(feed);
           setupMobileActiveCard();
@@ -327,11 +339,20 @@ function renderClientScript() {
             const next = data.pagination.hasNext ? '<button data-page="' + (data.pagination.page + 1) + '">下一页</button>' : '';
             pager.innerHTML = prev + '<span>' + data.pagination.page + ' / ' + data.pagination.total + '</span>' + next;
           }
+          return true;
         };
+
+        const deepLinkController = createDeepLinkController(window, {
+          root,
+          feed,
+          loadPage: (page, isCurrent) => loadPage(page, isCurrent),
+          highlightDuration: 2400,
+          onError: (error) => { status.textContent = error.message; },
+        });
 
         pager.addEventListener('click', (event) => {
           const button = event.target.closest('button[data-page]');
-          if (button) loadPage(button.dataset.page).catch((error) => { status.textContent = error.message; });
+          if (button) deepLinkController.goToPage(button.dataset.page).catch((error) => { status.textContent = error.message; });
           });
           feed.addEventListener('click', (event) => {
             const thumb = event.target.closest('[data-bb-media-index]');
@@ -375,7 +396,7 @@ function renderClientScript() {
             const track = event.target.closest && event.target.closest('[data-bb-image-track]');
             if (track) syncImageViewerIndex(track);
           }, { passive: true, capture: true });
-          loadPage().catch((error) => { status.textContent = error.message; });
+          deepLinkController.start().catch((error) => { status.textContent = error.message; });
         });
         window.initBbChannel();
         document.addEventListener('DOMContentLoaded', window.initBbChannel, { once: true });
@@ -400,8 +421,8 @@ function renderClientContent(config) {
       .bb-channel-portable .bb-channel-card{position:relative;border-radius:14px}
       .bb-channel-portable .bb-channel-card-placeholder{pointer-events:none;position:absolute;inset:0;border:1px dashed var(--bb-card-placeholder-border);border-radius:14px;background:var(--bb-card-placeholder-bg);opacity:0;transition:opacity var(--bb-card-transition)}
       .bb-channel-portable .bb-channel-card-surface{position:relative;z-index:1;border:1px dashed var(--bb-card-placeholder-border);border-radius:14px;background:var(--bb-card-surface-bg);padding:1.45rem 1.65rem;box-shadow:none;transition:border-color var(--bb-card-transition),background-color var(--bb-card-transition),box-shadow var(--bb-card-transition),transform var(--bb-card-transition)}
-      .bb-channel-portable .bb-channel-card[data-bb-card-active="true"] .bb-channel-card-placeholder{opacity:1}
-      .bb-channel-portable .bb-channel-card[data-bb-card-active="true"] .bb-channel-card-surface{transform:translate(var(--bb-card-offset-x),var(--bb-card-offset-y));border-style:solid;border-color:var(--bb-card-active-border);background:var(--bb-card-active-bg);box-shadow:var(--bb-card-active-shadow)}
+      .bb-channel-portable .bb-channel-card[data-bb-card-active="true"] .bb-channel-card-placeholder,.bb-channel-portable .bb-channel-card[data-bb-deep-link-active="true"] .bb-channel-card-placeholder{opacity:1}
+      .bb-channel-portable .bb-channel-card[data-bb-card-active="true"] .bb-channel-card-surface,.bb-channel-portable .bb-channel-card[data-bb-deep-link-active="true"] .bb-channel-card-surface{transform:translate(var(--bb-card-offset-x),var(--bb-card-offset-y));border-style:solid;border-color:var(--bb-card-active-border);background:var(--bb-card-active-bg);box-shadow:var(--bb-card-active-shadow)}
       @media(hover:hover) and (pointer:fine){.bb-channel-portable .bb-channel-card:hover .bb-channel-card-placeholder{opacity:1}.bb-channel-portable .bb-channel-card:hover .bb-channel-card-surface{transform:translate(var(--bb-card-offset-x),var(--bb-card-offset-y));border-style:solid;border-color:var(--bb-card-active-border);background:var(--bb-card-active-bg);box-shadow:var(--bb-card-active-shadow)}}
       .bb-channel-portable .bb-channel-dot{position:absolute;left:-2.16rem;top:1.7rem;z-index:2;width:.56rem;height:.56rem;border-radius:999px;background:#ff7900;box-shadow:0 0 0 .28rem rgba(255,121,0,.12)}
       .bb-channel-portable .bb-channel-meta{display:flex;align-items:center;gap:.7rem;margin:0 0 1.08rem;color:#737373;font-weight:500}
@@ -452,7 +473,7 @@ function renderClientContent(config) {
       @media(max-width:720px){.bb-channel-portable .bb-channel-body-with-media{grid-template-columns:1fr}.bb-channel-portable .bb-channel-media-rail{justify-self:start;width:min(18rem,100%)}}
       @keyframes bb-channel-shimmer{0%{background-position:180% 0}100%{background-position:-80% 0}}
       @media(max-width:640px){.bb-channel-portable{--bb-card-offset-x:var(--bb-card-mobile-offset-x);--bb-card-offset-y:var(--bb-card-mobile-offset-y);--bb-card-active-shadow:0 12px 26px -24px rgba(15,23,42,.32)}.bb-channel-portable .bb-channel-intro{margin-bottom:1.2rem}.bb-channel-portable .bb-channel-title{font-size:1.45rem}.bb-channel-portable .bb-channel-intro-text{font-size:.94rem}.bb-channel-portable .bb-channel-feed{gap:.9rem;padding-left:1.15rem}.bb-channel-portable .bb-channel-feed::before{left:.06rem}.bb-channel-portable .bb-channel-dot{left:-1.32rem;top:1.42rem}.bb-channel-portable .bb-channel-card-surface{padding:1.05rem .95rem;border-radius:12px}.bb-channel-portable .bb-channel-card-placeholder{border-radius:12px}.bb-channel-portable .bb-channel-meta{margin-bottom:.85rem}.bb-channel-portable .bb-channel-content{font-size:.96rem;line-height:1.72}.bb-channel-portable .bb-channel-media-rail{width:100%;max-width:20rem;grid-template-columns:repeat(3,minmax(0,1fr));justify-self:center;margin-top:.15rem}.bb-channel-portable .bb-channel-media-thumb{min-height:4.1rem}.bb-channel-portable .bb-channel-image-viewer{margin-top:.95rem;max-width:100%}.bb-channel-portable .bb-channel-image-slide{min-height:10rem}.bb-channel-portable .bb-channel-image-large{max-width:100%!important;max-height:68vh!important}.bb-channel-portable .bb-channel-image-nav{width:2.55rem;height:2.55rem}.bb-channel-portable .bb-channel-image-prev{left:.45rem}.bb-channel-portable .bb-channel-image-next{right:.45rem}.bb-channel-portable .bb-channel-attachment{align-items:flex-start;padding:.78rem .82rem}.bb-channel-portable .bb-channel-attachment-title{white-space:normal;overflow-wrap:anywhere}.bb-channel-portable .bb-channel-tags{gap:.42rem}.bb-channel-portable .bb-channel-pagination{gap:1rem}}
-      @media(prefers-reduced-motion:reduce){.bb-channel-portable .bb-channel-card-placeholder,.bb-channel-portable .bb-channel-card-surface,.bb-channel-portable .bb-channel-media-rail,.bb-channel-portable .bb-channel-image-viewer,.bb-channel-portable .bb-channel-image-large,.bb-channel-portable .bb-channel-attachment{transition:none}.bb-channel-portable .bb-channel-card:hover .bb-channel-card-surface,.bb-channel-portable .bb-channel-card[data-bb-card-active="true"] .bb-channel-card-surface{transform:none}}
+      @media(prefers-reduced-motion:reduce){.bb-channel-portable .bb-channel-card-placeholder,.bb-channel-portable .bb-channel-card-surface,.bb-channel-portable .bb-channel-media-rail,.bb-channel-portable .bb-channel-image-viewer,.bb-channel-portable .bb-channel-image-large,.bb-channel-portable .bb-channel-attachment{transition:none}.bb-channel-portable .bb-channel-card:hover .bb-channel-card-surface,.bb-channel-portable .bb-channel-card[data-bb-card-active="true"] .bb-channel-card-surface,.bb-channel-portable .bb-channel-card[data-bb-deep-link-active="true"] .bb-channel-card-surface{transform:none}}
     </style>
     <div class="bb-channel-portable" data-bb-channel-root data-api-base="${escapeHtml(config.apiBase)}" data-page-size="${escapeHtml(config.pageSize)}">
       <header class="bb-channel-intro">

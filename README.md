@@ -133,6 +133,17 @@ If your theme or source folder already has a `/bb/` page, remove it or change `b
 - Multi-image horizontal carousel
 - File attachment cards
 - Image lazy hydration compatible with Hexo image lazyload plugins
+- Shareable deep links with browser Back and Forward support
+
+### Deep links
+
+Link directly to an asynchronously rendered post by including its page and card ID:
+
+```text
+/bb/?page=2#bb-123
+```
+
+The plugin loads page 2 first, then scrolls to `bb-123` and briefly applies the same visual treatment used for the selected card. Pagination updates `?page=N`, clears an old post hash, and works with browser Back and Forward. If the target ID is not present on the requested page, the page remains usable and the plugin does not search other pages.
 
 ## API Contract
 

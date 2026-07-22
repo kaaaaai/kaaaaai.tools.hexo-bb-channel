@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+- Added shareable `?page=N#bb-ID` deep links with post-render scrolling, temporary selected-card highlighting, and browser history restoration.
+
+### Fixed
+
+- Prevented stale pagination responses from replacing a newer page during rapid navigation.
+
 ## 0.1.4 - 2026-07-20
 
 ### Fixed
